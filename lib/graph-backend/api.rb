@@ -7,6 +7,7 @@ module Graph::Backend
     format :json
     default_format :json
 
+    rescue_from Graph::Backend::Error
     error_format :json
 
     helpers do
@@ -32,6 +33,15 @@ module Graph::Backend
 
     delete "/entities/:uuid/roles/:role" do
       Node.remove_role(params[:uuid], params[:role])
+      ''
+    end
+
+    get "/entities/:uuid1/:relationship/:uuid2" do
+      error!('Not found', 404) unless Relation.exists?(params[:relationship], params[:uuid1], params[:uuid2])
+    end
+
+    post "/entities/:uuid1/:relationship/:uuid2" do
+      Relation.create(params[:relationship], params[:uuid1], params[:uuid2])
       ''
     end
   end
