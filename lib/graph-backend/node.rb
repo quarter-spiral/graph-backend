@@ -22,7 +22,15 @@ module Graph::Backend
       node  = get_node(uuid_or_node)
       roles = get_roles(node)
       roles << role
-      connection.set_node_properties(node, 'roles' => roles.uniq)
+      set_roles(node, roles)
+    end
+
+    def self.remove_role(uuid_or_node, role)
+      ensure_role_exists(role)
+      node = get_node(uuid_or_node)
+      roles = get_roles(node)
+      roles.delete role
+      set_roles(node, roles)
     end
 
     protected
@@ -40,6 +48,14 @@ module Graph::Backend
 
     def self.escape_string(string)
       string.gsub(/[^\\]"/, '\"')
+    end
+
+    def self.set_roles(node, roles)
+      if roles.empty?
+        connection.remove_node_properties(node, 'roles')
+      else
+        connection.set_node_properties(node, 'roles' => roles.uniq)
+      end
     end
   end
 end

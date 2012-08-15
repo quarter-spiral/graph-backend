@@ -19,5 +19,12 @@ describe Graph::Backend::API do
       client.post "/v1/entities/#{@entity1}/roles/developer"
       JSON.parse(client.get("/v1/roles/developer").body).must_include @entity1
     end
+
+    it "can remove roles of an entity" do
+      JSON.parse(client.get("/v1/roles/developer").body).wont_include @entity1
+      client.post   "/v1/entities/#{@entity1}/roles/developer"
+      client.delete "/v1/entities/#{@entity1}/roles/developer"
+      JSON.parse(client.get("/v1/roles/developer").body).wont_include @entity1
+    end
   end
 end

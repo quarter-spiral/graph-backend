@@ -29,5 +29,10 @@ module Graph::Backend
       Node.add_role(params[:uuid], params[:role])
       ''
     end
+
+    delete "/entities/:uuid/roles/:role" do
+      Node.remove_role(params[:uuid], params[:role])
+      ''
+    end
   end
 end
