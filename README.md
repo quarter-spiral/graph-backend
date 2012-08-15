@@ -201,17 +201,16 @@ The response might be: ``["dev-1", "dev-2"]``
 
 The supported relations are:
 
-+--------------+---------------------+--------------------------------------------+
+| Name         | Description         | Example                                    |
+|--------------|---------------------|--------------------------------------------|
 | **develops** | Developer of a game | Jumping Sun Studios develops Sun Jumper IV |
-+--------------+---------------------+--------------------------------------------+
 
 ## Roles
 
 Every entity has a set of roles that define the node. Currently
 available roles are:
 
-+-----------+--------------------+
+| Name      | Description        |
+|-----------|--------------------|
 | developer | Developer of games |
-+-----------+--------------------+
 | game      | A game             |
-+-----------+--------------------+
