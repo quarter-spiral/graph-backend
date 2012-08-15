@@ -127,6 +127,76 @@ To find out ``What is Peter playing`` send a ``GET`` to:
 
 The response might be: ``["chess", "mahjong"]``.
 
+### Add role to an entity
+
+**POST** ``/entities/:UUID-SOURCE:/roles/:ROLE-NAME:``
+
+##### Parameters
+
+- **UUID-SOURCE** [REQUIRED]: The UUID of the source entity for the relationship
+- **ROLE-NAME** [REQUIRED]: Name of the role to add (see [roles](#roles))
+
+##### Body
+
+Empty.
+
+#### Response
+
+##### Body
+
+Empty.
+
+#### Example
+
+To ``make Peter a developer`` send a ``GET`` to: ``/entities/peter/roles/developer``.
+
+### Remove a role from an entity
+
+**DELETE** ``/entities/:UUID-SOURCE:/roles/:ROLE-NAME:``
+
+##### Parameters
+
+- **UUID-SOURCE** [REQUIRED]: The UUID of the source entity for the relationship
+- **ROLE-NAME** [REQUIRED]: Name of the role to add (see [roles](#roles))
+
+##### Body
+
+Empty.
+
+#### Response
+
+##### Body
+
+Empty.
+
+#### Example
+
+To ``revoke the developer role from Peter`` send a ``DELETE`` to: ``/entities/peter/roles/developer``.
+
+### List all entities which have a role
+
+**GET** ``/roles/:ROLE-NAME:``
+
+##### Parameters
+
+- **ROLE-NAME** [REQUIRED]: Name of the role to add (see [roles](#roles))
+
+##### Body
+
+Empty.
+
+#### Response
+
+##### Body
+
+A JSON encoded array of UUIDs of entities with that role.
+
+#### Example
+
+To ``find all developers`` send a ``GET`` to ``/roles/developer``.
+
+The response might be: ``["dev-1", "dev-2"]``
+
 ## Relation names
 
 The supported relations are:
@@ -134,3 +204,14 @@ The supported relations are:
 +--------------+---------------------+--------------------------------------------+
 | **develops** | Developer of a game | Jumping Sun Studios develops Sun Jumper IV |
 +--------------+---------------------+--------------------------------------------+
+
+## Roles
+
+Every entity has a set of roles that define the node. Currently
+available roles are:
+
++-----------+--------------------+
+| developer | Developer of games |
++-----------+--------------------+
+| game      | A game             |
++-----------+--------------------+
