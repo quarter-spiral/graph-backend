@@ -81,10 +81,12 @@ describe Graph::Backend::API do
       is_related?(@entity1, @entity2).must_equal false
       is_related?(@entity2, @entity1).must_equal false
       client.post "/v1/entities/#{@entity1}/develops/#{@entity2}", {}, JSON.dump(direction: 'both')
-      client.delete "/v1/entities/#{@entity1}/develops/#{@entity2}"
+      response = client.delete "/v1/entities/#{@entity1}/develops/#{@entity2}"
+      response.status.must_equal 200
       is_related?(@entity1, @entity2).must_equal false
       is_related?(@entity2, @entity1).must_equal true
-      client.delete "/v1/entities/#{@entity2}/develops/#{@entity1}"
+      response = client.delete "/v1/entities/#{@entity2}/develops/#{@entity1}"
+      response.status.must_equal 200
       is_related?(@entity1, @entity2).must_equal false
       is_related?(@entity2, @entity1).must_equal false
     end

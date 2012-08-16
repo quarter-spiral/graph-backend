@@ -46,6 +46,7 @@ module Graph::Backend
 
     get "/entities/:uuid1/:relationship/:uuid2" do
       not_found! unless Relation.exists?(params[:relationship], params[:uuid1], params[:uuid2])
+      ''
     end
 
     post "/entities/:uuid1/:relationship/:uuid2" do

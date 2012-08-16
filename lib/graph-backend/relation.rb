@@ -24,6 +24,7 @@ module Graph::Backend
       return false unless relationship_url
       relationship = connection.get_relationship(relationship_url)
       connection.delete_relationship(relationship)
+      true
     end
 
     def self.exists?(relationship_type, uuid1, uuid2)
