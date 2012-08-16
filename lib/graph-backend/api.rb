@@ -30,6 +30,10 @@ module Graph::Backend
       end
     end
 
+    get "/entities/:uuid/roles" do
+      Node.get_roles(params[:uuid])
+    end
+
     post "/entities/:uuid/roles/:role" do
       Node.add_role(params[:uuid], params[:role])
       ''

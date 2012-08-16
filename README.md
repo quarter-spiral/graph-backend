@@ -197,6 +197,33 @@ To ``find all developers`` send a ``GET`` to ``/roles/developer``.
 
 The response might be: ``["dev-1", "dev-2"]``
 
+### List all roles of an entity
+
+**GET** ``/entities/:UUID-SOURCE:/roles``
+
+##### Parameters
+
+- **UUID-SOURCE** [REQUIRED]: The UUID of the entity you want to look up the roles for
+
+##### Body
+
+Empty.
+
+#### Response
+
+##### Body
+
+A JSON encoded array of roles for that entity.
+
+#### Example
+
+To ``find what roles Peter has`` send a ``GET`` to
+``/entities/peter/roles``.
+
+The response might be: ``["developer"]``
+
+
+
 ## Relation names
 
 The supported relations are:

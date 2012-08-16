@@ -43,6 +43,14 @@ describe Graph::Backend::API do
       response.status.wont_equal 201
       JSON.parse(response.body)['error'].wont_be_nil
     end
+
+    it "can retrieve the roles of an entity" do
+      response = client.get "/v1/entities/#{@entity1}/roles"
+      JSON.parse(response.body).wont_include 'developer'
+      client.post   "/v1/entities/#{@entity1}/roles/developer"
+      response = client.get "/v1/entities/#{@entity1}/roles"
+      JSON.parse(response.body).must_include 'developer'
+    end
   end
 
   describe "relations" do
