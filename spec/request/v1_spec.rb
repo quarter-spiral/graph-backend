@@ -51,6 +51,21 @@ describe Graph::Backend::API do
         is_related?(@entity1, @entity2).must_equal false
         client.post "/v1/entities/#{@entity1}/develops/#{@entity2}"
         is_related?(@entity1, @entity2).must_equal true
+        is_related?(@entity2, @entity1).must_equal false
+      end
+
+      it "incoming" do
+        is_related?(@entity1, @entity2).must_equal false
+        client.post "/v1/entities/#{@entity1}/develops/#{@entity2}", {}, JSON.dump(direction: 'incoming')
+        is_related?(@entity1, @entity2).must_equal false
+        is_related?(@entity2, @entity1).must_equal true
+      end
+
+      it "both ways" do
+        is_related?(@entity1, @entity2).must_equal false
+        client.post "/v1/entities/#{@entity1}/develops/#{@entity2}", {}, JSON.dump(direction: 'both')
+        is_related?(@entity1, @entity2).must_equal true
+        is_related?(@entity2, @entity1).must_equal true
       end
     end
   end

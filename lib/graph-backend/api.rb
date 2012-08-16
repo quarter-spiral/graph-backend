@@ -41,7 +41,7 @@ module Graph::Backend
     end
 
     post "/entities/:uuid1/:relationship/:uuid2" do
-      Relation.create(params[:relationship], params[:uuid1], params[:uuid2])
+      Relation.create(params[:relationship], params[:uuid1], params[:uuid2], params[:direction])
       ''
     end
   end
