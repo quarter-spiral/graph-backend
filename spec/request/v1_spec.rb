@@ -68,5 +68,47 @@ describe Graph::Backend::API do
         is_related?(@entity2, @entity1).must_equal true
       end
     end
+
+    it "can be deleted" do
+      is_related?(@entity1, @entity2).must_equal false
+      is_related?(@entity2, @entity1).must_equal false
+      client.post "/v1/entities/#{@entity1}/develops/#{@entity2}", {}, JSON.dump(direction: 'both')
+      client.delete "/v1/entities/#{@entity1}/develops/#{@entity2}"
+      is_related?(@entity1, @entity2).must_equal false
+      is_related?(@entity2, @entity1).must_equal true
+      client.delete "/v1/entities/#{@entity2}/develops/#{@entity1}"
+      is_related?(@entity1, @entity2).must_equal false
+      is_related?(@entity2, @entity1).must_equal false
+    end
+
+    it "responds 404 when trying to delete a non-existing relationship" do
+      is_related?(@entity1, @entity2).must_equal false
+      response = client.delete "/v1/entities/#{@entity1}/develops/#{@entity2}"
+      response.status.must_equal 404
+    end
+
+    it "can list related entities" do
+      @entity3 = UUID.new.generate
+      @entity4 = UUID.new.generate
+
+      client.post "/v1/entities/#{@entity1}/develops/#{@entity2}", {}, JSON.dump(direction: 'both')
+      client.post "/v1/entities/#{@entity1}/develops/#{@entity3}"
+      client.post "/v1/entities/#{@entity2}/develops/#{@entity4}"
+
+      games_of_entity_1 = JSON.parse(client.get("/v1/entities/#{@entity1}/develops").body)
+      games_of_entity_1.must_include @entity2
+      games_of_entity_1.must_include @entity3
+
+
+      games_of_entity_2 = JSON.parse(client.get("/v1/entities/#{@entity2}/develops").body)
+      games_of_entity_2.must_include @entity1
+      games_of_entity_2.must_include @entity4
+
+      games_of_entity_3 = JSON.parse(client.get("/v1/entities/#{@entity3}/develops").body)
+      games_of_entity_3.empty?.must_equal true
+
+      games_of_entity_4 = JSON.parse(client.get("/v1/entities/#{@entity4}/develops").body)
+      games_of_entity_4.empty?.must_equal true
+    end
   end
 end

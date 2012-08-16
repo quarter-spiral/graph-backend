@@ -14,6 +14,10 @@ module Graph::Backend
       def connection
         @connection ||= Connection.create
       end
+
+      def not_found!
+        error!('Not found', 404)
+      end
     end
 
     get "version" do
@@ -37,12 +41,21 @@ module Graph::Backend
     end
 
     get "/entities/:uuid1/:relationship/:uuid2" do
-      error!('Not found', 404) unless Relation.exists?(params[:relationship], params[:uuid1], params[:uuid2])
+      not_found! unless Relation.exists?(params[:relationship], params[:uuid1], params[:uuid2])
     end
 
     post "/entities/:uuid1/:relationship/:uuid2" do
       Relation.create(params[:relationship], params[:uuid1], params[:uuid2], params[:direction])
       ''
+    end
+
+    delete "/entities/:uuid1/:relationship/:uuid2" do
+      not_found! unless Relation.delete(params[:relationship], params[:uuid1], params[:uuid2])
+      ''
+    end
+
+    get "/entities/:uuid1/:relationship" do
+      Relation.list_for(params[:relationship], params[:uuid1])
     end
   end
 end

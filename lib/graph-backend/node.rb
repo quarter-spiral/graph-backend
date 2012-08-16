@@ -3,7 +3,8 @@ module Graph::Backend
     ROLES = ['developer', 'game']
 
     def self.find_or_create(uuid)
-      connection.get_node_auto_index('uuid', uuid) || connection.create_node('uuid' => uuid)
+      node = connection.get_node_auto_index('uuid', uuid) || connection.create_node('uuid' => uuid)
+      node.is_a?(Array) ? node.first : node
     end
 
     def self.find_by_role(role)
