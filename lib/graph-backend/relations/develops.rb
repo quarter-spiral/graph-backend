@@ -1,7 +1,7 @@
 module Graph::Backend::Relations
   class Develops < Base
     def valid?
-      true
+      Graph::Backend::Node.get_roles(@uuid1).include?('developer')
     end
   end
 end

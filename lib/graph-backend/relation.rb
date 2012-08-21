@@ -73,12 +73,12 @@ module Graph::Backend
       return unless validator
 
       if ['incoming', 'both'].include?(direction)
-        valid = validator.new(uuid2, uuid1, connection).valid?
+        valid = validator.new(uuid2, uuid1).valid?
         raise Error.new("Relation: #{uuid2} #{relationship_type} #{uuid1} is invalid!") unless valid
       end
 
       if ['outgoing', 'both'].include?(direction)
-        valid = validator.new(uuid1, uuid2, connection).valid?
+        valid = validator.new(uuid1, uuid2).valid?
         raise Error.new("Relation: #{uuid1} #{relationship_type} #{uuid2} is invalid!") unless valid
       end
     end
