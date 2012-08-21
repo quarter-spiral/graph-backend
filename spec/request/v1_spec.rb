@@ -213,11 +213,16 @@ describe Graph::Backend::API do
         end
 
         after do
+          # overcoming a stupid 1.9.2/minitest bug
+          Graph::Backend::Relation::RELATIONSHIP_TYPES << 'test_relates'
+
           is_related?(@entity1, @entity2).must_equal false
           is_related?(@entity1, @entity2, 'test_relates_two').must_equal true
           is_related?(@entity1, @entity3).must_equal false
           is_related?(@entity3, @entity1).must_equal true
           is_related?(@entity1, @entity4, 'test_relates_two').must_equal true
+
+          Graph::Backend::Relation::RELATIONSHIP_TYPES.delete 'test_relates_two'
         end
 
         it "works on adding roles" do
