@@ -15,7 +15,6 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = Graph::Backend::VERSION
 
-  gem.add_dependency 'json'
   gem.add_dependency 'grape', '0.2.0'
   gem.add_dependency 'json', '1.7.4'
   gem.add_dependency 'neography', '0.0.29'

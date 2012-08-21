@@ -57,6 +57,7 @@ module Graph::Backend
       else
         connection.set_node_properties(node, 'roles' => roles.uniq)
       end
+      Relation.revise_relationships_for(node['data']['uuid'])
     end
   end
 end

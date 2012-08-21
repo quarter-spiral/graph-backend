@@ -10,6 +10,7 @@ require "graph-backend/version"
 require "graph-backend/error"
 require "graph-backend/connection"
 require "graph-backend/node"
+require "graph-backend/relations"
 require "graph-backend/relation"
 require "graph-backend/api"
 

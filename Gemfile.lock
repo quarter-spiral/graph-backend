@@ -4,7 +4,6 @@ PATH
     graph-backend (0.0.1)
       grape (= 0.2.0)
       json (= 1.7.4)
-      json
       neography (= 0.0.29)
 
 GEM
