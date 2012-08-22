@@ -34,11 +34,14 @@ module Graph::Backend
       !get_path(relationship_type, uuid1, uuid2).empty?
     end
 
-    def self.list_for(relationship_type, uuid)
+    def self.list_for(relationship_type, uuid, direction)
+      direction ||= 'outgoing'
+      ensure_direction_is_valid(direction)
+
       ensure_relationship_type_exists(relationship_type)
 
       node = Node.find_or_create(uuid)
-      relationships = connection.get_node_relationships(node, 'outgoing', relationship_type)
+      relationships = connection.get_node_relationships(node, direction, relationship_type)
       get_ends(node, relationships).map {|relationship, node| node['body']['data']['uuid']}.uniq
     end
 

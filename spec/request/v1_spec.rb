@@ -159,6 +159,45 @@ describe Graph::Backend::API do
       games_of_entity_4.empty?.must_equal true
     end
 
+    it "can list incoming related entities" do
+      @entity3 = UUID.new.generate
+      @entity4 = UUID.new.generate
+
+      client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}"
+      client.post "/v1/entities/#{@entity3}/test_relates/#{@entity2}"
+      client.post "/v1/entities/#{@entity4}/test_relates/#{@entity1}"
+
+      relations = JSON.parse(client.get("/v1/entities/#{@entity2}/test_relates", {}, direction: 'incoming').body)
+      relations.must_include(@entity1)
+      relations.wont_include(@entity2)
+      relations.must_include(@entity3)
+      relations.wont_include(@entity4)
+
+      relations = JSON.parse(client.get("/v1/entities/#{@entity1}/test_relates", {}, direction: 'incoming').body)
+      relations.must_equal [@entity4]
+    end
+
+    it "can list two way related entities" do
+      @entity3 = UUID.new.generate
+      @entity4 = UUID.new.generate
+
+      client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}"
+      client.post "/v1/entities/#{@entity3}/test_relates/#{@entity2}"
+      client.post "/v1/entities/#{@entity4}/test_relates/#{@entity1}"
+
+      relations = JSON.parse(client.get("/v1/entities/#{@entity2}/test_relates", {}, direction: 'both').body)
+      relations.must_include(@entity1)
+      relations.wont_include(@entity2)
+      relations.must_include(@entity3)
+      relations.wont_include(@entity4)
+
+      relations = JSON.parse(client.get("/v1/entities/#{@entity1}/test_relates", {}, direction: 'both').body)
+      relations.wont_include(@entity1)
+      relations.must_include(@entity2)
+      relations.wont_include(@entity3)
+      relations.must_include(@entity4)
+    end
+
     describe "valiation mechanism" do
       before do
         Graph::Backend::Relations::TestRelates.always_valid(false)

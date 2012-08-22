@@ -112,7 +112,10 @@ If ``Peter stops playing chess`` send a ``DELETE`` to: ``/entities/peter/plays/c
 
 ##### Body
 
-Empty.
+JSON encoded options hash.
+
+- **direction** [OPTIONAL]: Direction of the related entities. Possible values: ``both``
+  (entities relating to the given UUID and entities the given UUID is relating to), ``incoming`` (entities relating to the given UUID) and ``outgoing`` (default) (entities the given UUID is relating to).
 
 #### Response
 
@@ -126,6 +129,11 @@ To find out ``What is Peter playing`` send a ``GET`` to:
 ``/entities/peter/plays``.
 
 The response might be: ``["chess", "mahjong"]``.
+
+To find out ``Who is playing chess`` send a ``GET`` to:
+``/entities/chess/plays?direction=incoming``.
+
+The response might be: ``["peter"]``.
 
 ### Add role to an entity
 
@@ -221,8 +229,6 @@ To ``find what roles Peter has`` send a ``GET`` to
 ``/entities/peter/roles``.
 
 The response might be: ``["developer"]``
-
-
 
 ## Relation names
 
