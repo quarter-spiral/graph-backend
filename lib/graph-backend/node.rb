@@ -34,6 +34,11 @@ module Graph::Backend
       set_roles(node, roles)
     end
 
+    def self.delete(uuid_or_node)
+      node = get_node(uuid_or_node)
+      connection.delete_node!(node)
+    end
+
     protected
     def self.connection
       @connection ||= Connection.create

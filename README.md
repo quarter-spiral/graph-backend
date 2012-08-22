@@ -135,6 +135,32 @@ To find out ``Who is playing chess`` send a ``GET`` to:
 
 The response might be: ``["peter"]``.
 
+
+### Remove an entity and all it's relations from the graph
+
+#### Request
+
+**DELETE** ``/entities/:UUID-SOURCE:``
+
+##### Parameters
+
+- **UUID-SOURCE** [REQUIRED]: The UUID of the entity to delete
+
+##### Body
+
+Empty.
+
+#### Response
+
+##### Body
+
+Empty.
+
+#### Example
+
+To ``Remove the game chess and all connections to it's players`` send a
+``DELETE`` to: ``/entities/chess``.
+
 ### Add role to an entity
 
 **POST** ``/entities/:UUID-SOURCE:/roles/:ROLE-NAME:``

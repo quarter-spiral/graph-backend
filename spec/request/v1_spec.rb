@@ -198,6 +198,33 @@ describe Graph::Backend::API do
       relations.must_include(@entity4)
     end
 
+    it "can remove nodes with all it's relations" do
+      @entity3 = UUID.new.generate
+      client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}"
+      client.post "/v1/entities/#{@entity1}/test_relates/#{@entity3}", {}, direction: 'both'
+
+      relations = JSON.parse(client.get("/v1/entities/#{@entity1}/test_relates", {}, direction: 'both').body)
+      relations.must_include @entity2
+      relations.must_include @entity3
+
+      relations = JSON.parse(client.get("/v1/entities/#{@entity2}/test_relates", {}, direction: 'both').body)
+      relations.must_include @entity1
+
+      relations = JSON.parse(client.get("/v1/entities/#{@entity3}/test_relates", {}, direction: 'both').body)
+      relations.must_include @entity1
+
+      client.delete "/v1/entities/#{@entity1}"
+
+      relations = JSON.parse(client.get("/v1/entities/#{@entity1}/test_relates", {}, direction: 'both').body)
+      relations.empty?.must_equal true
+
+      relations = JSON.parse(client.get("/v1/entities/#{@entity2}/test_relates", {}, direction: 'both').body)
+      relations.wont_include @entity1
+
+      relations = JSON.parse(client.get("/v1/entities/#{@entity3}/test_relates", {}, direction: 'both').body)
+      relations.wont_include @entity1
+    end
+
     describe "valiation mechanism" do
       before do
         Graph::Backend::Relations::TestRelates.always_valid(false)

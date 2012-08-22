@@ -31,6 +31,11 @@ module Graph::Backend
     end
 
     namespace '/entities' do
+      delete "/:uuid" do
+        Node.delete(params[:uuid])
+        ''
+      end
+
       get "/:uuid/roles" do
         Node.get_roles(params[:uuid])
       end
