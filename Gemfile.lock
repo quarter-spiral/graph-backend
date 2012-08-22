@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    graph-backend (0.0.2)
+    graph-backend (0.0.3)
       grape (= 0.2.0)
       json (= 1.7.4)
       neography (= 0.0.29)
