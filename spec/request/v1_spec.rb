@@ -37,7 +37,17 @@ module Graph::Backend::Relations
 end
 
 def client
-  @client ||= Rack::Client.new {run API}
+  return @client if @client
+
+  @client = Rack::Client.new {run API}
+  def @client.get(url, headers = {}, body = '', &block)
+    request('GET', url, headers, body, {}, &block)
+  end
+  def @client.delete(url, headers = {}, body = '', &block)
+    request('DELETE', url, headers, body, {}, &block)
+  end
+
+  @client
 end
 
 def has_role?(uuid, role)
@@ -167,13 +177,13 @@ describe Graph::Backend::API do
       client.post "/v1/entities/#{@entity3}/test_relates/#{@entity2}"
       client.post "/v1/entities/#{@entity4}/test_relates/#{@entity1}"
 
-      relations = JSON.parse(client.get("/v1/entities/#{@entity2}/test_relates", {}, direction: 'incoming').body)
+      relations = JSON.parse(client.get("/v1/entities/#{@entity2}/test_relates", {}, JSON.dump(direction: 'incoming')).body)
       relations.must_include(@entity1)
       relations.wont_include(@entity2)
       relations.must_include(@entity3)
       relations.wont_include(@entity4)
 
-      relations = JSON.parse(client.get("/v1/entities/#{@entity1}/test_relates", {}, direction: 'incoming').body)
+      relations = JSON.parse(client.get("/v1/entities/#{@entity1}/test_relates", {}, JSON.dump(direction: 'incoming')).body)
       relations.must_equal [@entity4]
     end
 
@@ -185,13 +195,13 @@ describe Graph::Backend::API do
       client.post "/v1/entities/#{@entity3}/test_relates/#{@entity2}"
       client.post "/v1/entities/#{@entity4}/test_relates/#{@entity1}"
 
-      relations = JSON.parse(client.get("/v1/entities/#{@entity2}/test_relates", {}, direction: 'both').body)
+      relations = JSON.parse(client.get("/v1/entities/#{@entity2}/test_relates", {}, JSON.dump(direction: 'both')).body)
       relations.must_include(@entity1)
       relations.wont_include(@entity2)
       relations.must_include(@entity3)
       relations.wont_include(@entity4)
 
-      relations = JSON.parse(client.get("/v1/entities/#{@entity1}/test_relates", {}, direction: 'both').body)
+      relations = JSON.parse(client.get("/v1/entities/#{@entity1}/test_relates", {}, JSON.dump(direction: 'both')).body)
       relations.wont_include(@entity1)
       relations.must_include(@entity2)
       relations.wont_include(@entity3)
@@ -201,27 +211,27 @@ describe Graph::Backend::API do
     it "can remove nodes with all it's relations" do
       @entity3 = UUID.new.generate
       client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}"
-      client.post "/v1/entities/#{@entity1}/test_relates/#{@entity3}", {}, direction: 'both'
+      client.post "/v1/entities/#{@entity1}/test_relates/#{@entity3}", {}, JSON.dump(direction: 'both')
 
-      relations = JSON.parse(client.get("/v1/entities/#{@entity1}/test_relates", {}, direction: 'both').body)
+      relations = JSON.parse(client.get("/v1/entities/#{@entity1}/test_relates", {}, JSON.dump(direction: 'both')).body)
       relations.must_include @entity2
       relations.must_include @entity3
 
-      relations = JSON.parse(client.get("/v1/entities/#{@entity2}/test_relates", {}, direction: 'both').body)
+      relations = JSON.parse(client.get("/v1/entities/#{@entity2}/test_relates", {}, JSON.dump(direction: 'both')).body)
       relations.must_include @entity1
 
-      relations = JSON.parse(client.get("/v1/entities/#{@entity3}/test_relates", {}, direction: 'both').body)
+      relations = JSON.parse(client.get("/v1/entities/#{@entity3}/test_relates", {}, JSON.dump(direction: 'both')).body)
       relations.must_include @entity1
 
       client.delete "/v1/entities/#{@entity1}"
 
-      relations = JSON.parse(client.get("/v1/entities/#{@entity1}/test_relates", {}, direction: 'both').body)
+      relations = JSON.parse(client.get("/v1/entities/#{@entity1}/test_relates", {}, JSON.dump(direction: 'both')).body)
       relations.empty?.must_equal true
 
-      relations = JSON.parse(client.get("/v1/entities/#{@entity2}/test_relates", {}, direction: 'both').body)
+      relations = JSON.parse(client.get("/v1/entities/#{@entity2}/test_relates", {}, JSON.dump(direction: 'both')).body)
       relations.wont_include @entity1
 
-      relations = JSON.parse(client.get("/v1/entities/#{@entity3}/test_relates", {}, direction: 'both').body)
+      relations = JSON.parse(client.get("/v1/entities/#{@entity3}/test_relates", {}, JSON.dump(direction: 'both')).body)
       relations.wont_include @entity1
     end
 
@@ -238,17 +248,17 @@ describe Graph::Backend::API do
         response = client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}"
         response.status.must_equal 201
 
-        response = client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}", {}, {direction: 'incoming'}
+        response = client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}", {}, JSON.dump({direction: 'incoming'})
         response.status.wont_equal 201
 
         Graph::Backend::Relations::TestRelates.valid(@entity2, @entity1)
-        response = client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}", {}, {direction: 'incoming'}
+        response = client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}", {}, JSON.dump({direction: 'incoming'})
         response.status.must_equal 201
 
         client.delete "/v1/entities/#{@entity1}/test_relates/#{@entity2}"
         client.delete "/v1/entities/#{@entity2}/test_relates/#{@entity1}"
 
-        response = client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}", {}, {direction: 'both'}
+        response = client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}", {}, JSON.dump({direction: 'both'})
         response.status.must_equal 201
         is_related?(@entity1, @entity2).must_equal true
         is_related?(@entity2, @entity1).must_equal true
@@ -267,7 +277,7 @@ describe Graph::Backend::API do
           client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}"
           client.post "/v1/entities/#{@entity1}/test_relates_two/#{@entity2}"
 
-          client.post "/v1/entities/#{@entity1}/test_relates/#{@entity3}", {}, direction: 'both'
+          client.post "/v1/entities/#{@entity1}/test_relates/#{@entity3}", {}, JSON.dump(direction: 'both')
 
           client.post "/v1/entities/#{@entity1}/test_relates_two/#{@entity4}"
 
