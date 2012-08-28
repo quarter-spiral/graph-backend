@@ -7,6 +7,4 @@ rvm:
 notifications:
   email: false
   campfire: "rumspringa:c0a20e6caab984176e5c72f84241b5f419662257@504871"
-before_install:
-  - which neo4j && sudo neo4j start
-  - sleep 3
+services: neo4j
