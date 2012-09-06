@@ -56,6 +56,7 @@ module Graph::Backend
       end
 
       post "/:uuid1/:relationship/:uuid2" do
+        throw(:error, :status => 304) if Relation.exists?(params[:relationship], params[:uuid1], params[:uuid2], params[:direction])
         Relation.create(params[:relationship], params[:uuid1], params[:uuid2], params[:direction])
         ''
       end

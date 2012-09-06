@@ -123,6 +123,13 @@ describe Graph::Backend::API do
         is_related?(@entity1, @entity2).must_equal true
         is_related?(@entity2, @entity1).must_equal true
       end
+
+      it "doesn't create them twice" do
+        response = client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}"
+        response.status.must_equal 201
+        response = client.post "/v1/entities/#{@entity2}/test_relates/#{@entity1}", {}, JSON.dump(direction: 'incoming')
+        response.status.must_equal 304
+      end
     end
 
     it "can be deleted" do

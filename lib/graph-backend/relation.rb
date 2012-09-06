@@ -32,10 +32,17 @@ module Graph::Backend
       true
     end
 
-    def self.exists?(relationship_type, uuid1, uuid2)
+    def self.exists?(relationship_type, uuid1, uuid2, direction = nil)
       ensure_relationship_type_exists(relationship_type)
 
-      !get_paths(relationship_type, uuid1, uuid2).empty?
+      result = true
+      if direction && (direction == 'incoming' || direction == 'both')
+        result = result && !get_paths(relationship_type, uuid2, uuid1).empty?
+      end
+      if !direction || (direction == 'outgoing' || direction == 'both')
+        result = result && !get_paths(relationship_type, uuid1, uuid2).empty?
+      end
+      result
     end
 
     def self.list_for(relationship_type, uuid, direction)

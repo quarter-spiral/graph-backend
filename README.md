@@ -36,6 +36,9 @@ relates to target)
 
 #### Response
 
+Will return status code 201 when created and 304 if the relation exists
+already.
+
 ##### Body
 
 Empty.
