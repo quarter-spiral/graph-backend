@@ -139,6 +139,19 @@ describe Graph::Backend::API do
       is_related?(@entity2, @entity1).must_equal false
     end
 
+    it "deletes all duplicate relations in one go" do
+      5.times do
+        client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}", {}, JSON.dump(direction: 'both')
+      end
+      is_related?(@entity1, @entity2).must_equal true
+      is_related?(@entity2, @entity1).must_equal true
+
+      client.delete "/v1/entities/#{@entity1}/test_relates/#{@entity2}"
+
+      is_related?(@entity1, @entity2).must_equal false
+      is_related?(@entity2, @entity1).must_equal true
+    end
+
     it "responds 404 when trying to delete a non-existing relationship" do
       is_related?(@entity1, @entity2).must_equal false
       response = client.delete "/v1/entities/#{@entity1}/test_relates/#{@entity2}"

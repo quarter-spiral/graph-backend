@@ -20,18 +20,22 @@ module Graph::Backend
     def self.delete(relationship_type, uuid1, uuid2)
       ensure_relationship_type_exists(relationship_type)
 
-      path = get_path(relationship_type, uuid1, uuid2)
-      relationship_url = (path['relationships'] || []).first
-      return false unless relationship_url
-      relationship = connection.get_relationship(relationship_url)
-      connection.delete_relationship(relationship)
+      paths = get_paths(relationship_type, uuid1, uuid2)
+      relationship_urls = paths.map {|path| (path['relationships'] || []).first}.compact
+
+      return false if relationship_urls.empty?
+
+      relationship_urls.each do |relationship_url|
+        relationship = connection.get_relationship(relationship_url)
+        connection.delete_relationship(relationship)
+      end
       true
     end
 
     def self.exists?(relationship_type, uuid1, uuid2)
       ensure_relationship_type_exists(relationship_type)
 
-      !get_path(relationship_type, uuid1, uuid2).empty?
+      !get_paths(relationship_type, uuid1, uuid2).empty?
     end
 
     def self.list_for(relationship_type, uuid, direction)
@@ -86,8 +90,8 @@ module Graph::Backend
       end
     end
 
-    def self.get_path(relationship_type, uuid1, uuid2)
-      connection.get_path(Node.find_or_create(uuid1), Node.find_or_create(uuid2), {"type"=> relationship_type, "direction" => "out"}, 1)
+    def self.get_paths(relationship_type, uuid1, uuid2)
+      connection.get_paths(Node.find_or_create(uuid1), Node.find_or_create(uuid2), {"type"=> relationship_type, "direction" => "out"}, 1)
     end
 
     def self.get_ends(node, relationships)
