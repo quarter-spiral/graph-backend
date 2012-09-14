@@ -7,5 +7,8 @@ group :development, :test do
   gem 'rack-client'
   gem 'uuid'
   gem 'rake'
-  gem 'thin'
+
+  platform :ruby do
+    gem 'thin'
+  end
 end
