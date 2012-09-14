@@ -7,4 +7,5 @@ group :development, :test do
   gem 'rack-client'
   gem 'uuid'
   gem 'rake'
+  gem 'thin'
 end
