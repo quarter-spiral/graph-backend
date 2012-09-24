@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    graph-backend (0.0.3)
+    graph-backend (0.0.4)
       grape (= 0.2.0)
       json (= 1.7.4)
       neography (= 0.0.29)
@@ -18,11 +18,10 @@ GEM
       rack
       rack-mount
     hashie (1.2.0)
-    httparty (0.8.3)
+    httparty (0.9.0)
       multi_json (~> 1.0)
       multi_xml
     json (1.7.4)
-    json (1.7.4-java)
     macaddr (1.6.1)
       systemu (~> 2.5.0)
     multi_json (1.3.6)

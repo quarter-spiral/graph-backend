@@ -1,3 +1,8 @@
+# 0.0.4
+
+  * Deals with/Prevents relationship duplicates
+  * A lot of improvements related to ``metaserver``
+
 # 0.0.3
 
 * Adds a direction parameter to queries for related entities
