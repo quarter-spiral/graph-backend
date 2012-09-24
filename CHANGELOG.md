@@ -1,3 +1,7 @@
+# 0.0.5
+
+* Adds thin to the main bundle to run on Heroku
+
 # 0.0.4
 
   * Deals with/Prevents relationship duplicates
