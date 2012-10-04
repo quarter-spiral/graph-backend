@@ -1,3 +1,7 @@
+# 0.0.6
+
+* Secures all requests with OAuth2
+
 # 0.0.5
 
 * Adds thin to the main bundle to run on Heroku
