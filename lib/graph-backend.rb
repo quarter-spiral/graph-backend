@@ -1,7 +1,7 @@
 module Graph
   module Backend
     def self.boot
-      Connection.setup_indices
+      Connection.create.setup_indices
     end
   end
 end

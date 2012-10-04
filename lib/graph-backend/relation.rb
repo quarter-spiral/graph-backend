@@ -71,7 +71,7 @@ module Graph::Backend
 
     protected
     def self.connection
-      @connection ||= Connection.create
+      @connection ||= Connection.create.neo4j
     end
 
     def self.ensure_relationship_type_exists(relationship_type)

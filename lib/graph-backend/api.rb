@@ -20,6 +20,12 @@ module Graph::Backend
       end
     end
 
+    before do
+      error!('Unauthenticated', 403) unless request.env['HTTP_AUTHORIZATION']
+      token = request.env['HTTP_AUTHORIZATION'].gsub(/^Bearer\s+/, '')
+      error!('Unauthenticated', 403) unless connection.auth.token_valid?(token)
+    end
+
     get "version" do
       api.version
     end

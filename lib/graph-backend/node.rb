@@ -41,7 +41,7 @@ module Graph::Backend
 
     protected
     def self.connection
-      @connection ||= Connection.create
+      @connection ||= Connection.create.neo4j
     end
 
     def self.get_node(uuid_or_node)
