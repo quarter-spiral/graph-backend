@@ -19,7 +19,7 @@ GIT
 PATH
   remote: .
   specs:
-    graph-backend (0.0.7)
+    graph-backend (0.0.8)
       auth-client (= 0.0.6)
       grape (= 0.2.0)
       json (= 1.7.4)
@@ -27,6 +27,7 @@ PATH
 
 GEM
   remote: https://rubygems.org/
+  remote: https://user:We267RFF7BfwVt4LdqFA@privategems.herokuapp.com/
   specs:
     actionpack (3.2.8)
       activemodel (= 3.2.8)

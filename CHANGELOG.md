@@ -1,3 +1,7 @@
+# 0.0.8
+
+* Adds private gemserver as a gem source
+
 # 0.0.7
 
 * ``OPTIONS`` requests do not need to be authenticated anymore
