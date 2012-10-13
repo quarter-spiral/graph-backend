@@ -1,3 +1,7 @@
+# 0.0.9
+
+* Relaxes dependency on auth-client
+
 # 0.0.8
 
 * Adds private gemserver as a gem source
