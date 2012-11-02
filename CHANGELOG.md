@@ -1,3 +1,7 @@
+# 0.0.10 WIP
+
+* Adds friends relationship and player role
+
 # 0.0.9
 
 * Relaxes dependency on auth-client

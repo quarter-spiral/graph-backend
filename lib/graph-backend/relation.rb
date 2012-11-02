@@ -1,6 +1,6 @@
 module Graph::Backend
   class Relation
-    RELATIONSHIP_TYPES = ['develops']
+    RELATIONSHIP_TYPES = ['develops', 'friends']
     DIRECTIONS = ['incoming', 'outgoing', 'both']
 
     def self.create(relationship_type, uuid1, uuid2, direction)

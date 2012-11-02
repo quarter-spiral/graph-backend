@@ -263,9 +263,10 @@ The response might be: ``["developer"]``
 
 The supported relations are:
 
-| Name         | Description         | Example                                    |
-|--------------|---------------------|--------------------------------------------|
-| **develops** | Developer of a game | Jumping Sun Studios develops Sun Jumper IV |
+| Name         | Description          | Example                                    |
+|--------------|----------------------|--------------------------------------------|
+| **develops** | Developer of a game  | Jumping Sun Studios develops Sun Jumper IV |
+| **friends**  | A friend of a player | Pete friends Kate                          |
 
 ## Roles
 
@@ -276,3 +277,4 @@ available roles are:
 |-----------|--------------------|
 | developer | Developer of games |
 | game      | A game             |
+| player    | A player           |
