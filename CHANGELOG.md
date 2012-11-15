@@ -1,3 +1,7 @@
+# 0.0.11 WIP
+
+* Eases the dependency on grape
+
 # 0.0.10
 
 * Adds friends relationship and player role
