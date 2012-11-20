@@ -10,6 +10,8 @@ require 'minitest/autorun'
 
 require 'graph-backend'
 
+require_relative './support/test_relationship'
+
 # Wipe the graph
 connection = Graph::Backend::Connection.create.neo4j
 (connection.find_node_auto_index('uuid:*') || []).each do |node|

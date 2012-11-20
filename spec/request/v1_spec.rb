@@ -1,99 +1,4 @@
-require_relative '../spec_helper.rb'
-
-require 'json'
-require 'uuid'
-require 'rack/client'
-
-include Graph::Backend
-
-module Graph::Backend::Relations
-  class TestRelates < Base
-    def self.valid(uuid1, uuid2, valid = true)
-      @valids ||= {}
-      @valids[uuid1] ||= {}
-      @valids[uuid1][uuid2] = valid
-    end
-
-    def self.invalid(uuid1, uuid2)
-      valid(uuid1, uuid2, false)
-    end
-
-    def self.valid?(uuid1, uuid2)
-      @always_valid || (@valids && @valids[uuid1] && @valids[uuid1][uuid2])
-    end
-
-    def self.always_valid(valid)
-      @always_valid = valid
-    end
-
-    def self.reset!
-      @valids = nil
-    end
-
-    def valid?
-      self.class.valid?(@uuid1, @uuid2)
-    end
-  end
-end
-
-class AuthenticationInjector
-  def self.token=(token)
-    @token = token
-  end
-
-  def self.token
-    @token
-  end
-
-  def self.reset!
-    @token = nil
-  end
-
-  def initialize(app)
-    @app = app
-  end
-
-  def call(env)
-    if token = self.class.token
-      env['HTTP_AUTHORIZATION'] = "Bearer #{token}"
-    end
-
-    @app.call(env)
-  end
-end
-
-ENV['QS_AUTH_BACKEND_URL'] = 'http://auth-backend.dev'
-
-API_APP  = API.new
-AUTH_APP = Auth::Backend::App.new(test: true)
-
-module Auth
-  class Client
-    alias raw_initialize initialize
-    def initialize(url, options = {})
-      raw_initialize(url, options.merge(adapter: [:rack, AUTH_APP]))
-    end
-  end
-end
-
-
-def client
-  return @client if @client
-
-  @client = client = Rack::Client.new {
-      use AuthenticationInjector
-      run API_APP
-  }
-
-  def @client.get(url, headers = {}, body = '', &block)
-    request('GET', url, headers, body, {}, &block)
-  end
-  def @client.delete(url, headers = {}, body = '', &block)
-    request('DELETE', url, headers, body, {}, &block)
-  end
-
-  @client
-end
+require_relative '../request_spec_helper.rb'
 
 def has_role?(uuid, role)
   JSON.parse(client.get("/v1/roles/#{role}").body).include? @entity1
@@ -102,10 +7,6 @@ end
 def is_related?(uuid1, uuid2, relationship_type = 'test_relates')
   client.get("/v1/entities/#{uuid1}/#{relationship_type}/#{uuid2}").status == 200
 end
-
-require 'auth-backend/test_helpers'
-auth_helpers = Auth::Backend::TestHelpers.new(AUTH_APP)
-token = auth_helpers.get_token
 
 describe Graph::Backend::API do
   before do
