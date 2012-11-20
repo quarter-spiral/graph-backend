@@ -3,18 +3,40 @@ module Graph::Backend
     RELATIONSHIP_TYPES = ['develops', 'friends']
     DIRECTIONS = ['incoming', 'outgoing', 'both']
 
+    attr_reader :uuid_source, :uuid_target, :relation
+
+    def initialize(uuid_source, uuid_target, relation)
+      @uuid_source = uuid_source
+      @uuid_target = uuid_target
+      @relation = relation
+    end
+
+    def to_json
+      {
+        "source" => uuid_source,
+        "target" => uuid_target,
+        "relation" => relation,
+        "meta" => {}
+      }
+    end
+
     def self.create(relationship_type, uuid1, uuid2, direction)
       direction ||= 'outgoing'
       ensure_relationship_type_exists(relationship_type)
       ensure_direction_is_valid(direction)
       ensure_relationship_is_valid(relationship_type, uuid1, uuid2, direction)
 
+      relations = []
+
       if ['incoming', 'both'].include?(direction)
         connection.create_relationship(relationship_type, Node.find_or_create(uuid2), Node.find_or_create(uuid1))
+        relations << Relation.new(uuid2, uuid1, relationship_type)
       end
       if ['outgoing', 'both'].include?(direction)
         connection.create_relationship(relationship_type, Node.find_or_create(uuid1), Node.find_or_create(uuid2))
+        relations << Relation.new(uuid1, uuid2, relationship_type)
       end
+      relations
     end
 
     def self.delete(relationship_type, uuid1, uuid2)
@@ -45,6 +67,12 @@ module Graph::Backend
       result
     end
 
+    def self.get(relationship_type, uuid1, uuid2)
+      ensure_relationship_type_exists(relationship_type)
+
+      get_paths(relationship_type, uuid1, uuid2)
+    end
+
     def self.list_for(relationship_type, uuid, direction)
       direction ||= 'outgoing'
       ensure_direction_is_valid(direction)
@@ -53,7 +81,9 @@ module Graph::Backend
 
       node = Node.find_or_create(uuid)
       relationships = connection.get_node_relationships(node, direction, relationship_type)
-      get_ends(node, relationships).map {|relationship, node| node['body']['data']['uuid']}.uniq
+      get_ends(node, relationships).map do |relationship, node|
+        Relation.new(uuid, node['body']['data']['uuid'], relationship_type).to_json
+      end.uniq
     end
 
     def self.revise_relationships_for(uuid)

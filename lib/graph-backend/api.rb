@@ -60,13 +60,13 @@ module Graph::Backend
 
       get "/:uuid1/:relationship/:uuid2" do
         not_found! unless Relation.exists?(params[:relationship], params[:uuid1], params[:uuid2])
-        ''
+        Relation.new(params[:uuid1], params[:uuid2], params[:relationship]).to_json
       end
 
       post "/:uuid1/:relationship/:uuid2" do
         throw(:error, :status => 304) if Relation.exists?(params[:relationship], params[:uuid1], params[:uuid2], params[:direction])
-        Relation.create(params[:relationship], params[:uuid1], params[:uuid2], params[:direction])
-        ''
+        relations = Relation.create(params[:relationship], params[:uuid1], params[:uuid2], params[:direction])
+        relations.map &:to_json
       end
 
       delete "/:uuid1/:relationship/:uuid2" do

@@ -27,12 +27,14 @@ The graph must be accessed by HTTPS.
 - **UUID-TARGET** [REQUIRED]: The UUID of the target entity of the relationship
 
 ##### Body
+
 JSON encoded options hash.
 
 - **direction**: Direction of the relation. Possible values: ``both``
   (source relates to targte and target relates to source),
   ``incoming`` (target relates to source) and ``outgoing`` (source
 relates to target)
+- **meta**: An object with meta information on this relationship. When used on an already existing relationship this will update the existing meta information and only overwrite keys that are present in this request. All existing meta keys that are not present in this request will remain untouched.
 
 #### Response
 
@@ -41,11 +43,26 @@ already.
 
 ##### Body
 
-Empty.
+JSON encoded array of objects which contains the new meta information (the array contains 2 elements if you create a relationship in ``both`` directions):
+
+```javascript
+[
+  {
+    "source": "peter",
+    "target": "chess",
+    "relation: "plays",
+    "meta": {
+      "location": "Paris"
+    }
+  }
+]
+```
 
 #### Example
 
 The relationship: ``Peter plays Chess`` would be created as a ``POST`` to: ``/entities/peter/plays/chess`` with the body ``{"direction": "outgoing"}``.
+
+The relationship: ``Peter plays Chess in Paris`` could be created as a ``POST`` to: ``/entities/peter/plays/chess`` with the body ``{"direction": "outgoing", "meta": {"location": "Paris"}``.
 
 ### Check for an existing relationship
 
@@ -69,12 +86,69 @@ HTTP status code 200 if the relation exists. HTTP status code 404 if not.
 
 ##### Body
 
-Empty.
+JSON encoded object of the form:
+
+```javascript
+{
+  "source": "peter",
+  "target": "chess",
+  "relation: "plays",
+  "meta": {
+    "location": "Paris"
+  }
+}
+```
 
 #### Example
 
 To find out if ``Peter plays chess`` send a ``GET`` to: ``/entities/peter/plays/chess``. If he does, it would return HTTP status code 200 otherwise status code 404.
 
+### Change metadata of an existing relationship
+
+#### Request
+
+**PUT** ``/entities/:UUID-SOURCE:/:RELATION-NAME:/:UUID-TARGET:``
+
+##### Parameters
+
+- **UUID-SOURCE** [REQUIRED]: The UUID of the source entity for the relationship
+- **RELATION-NAME** [REQUIRED]: Name of the relation type (see [relation names](#relation-names))
+- **UUID-TARGET** [REQUIRED]: The UUID of the target entity of the relationship
+
+##### Body
+
+JSON encoded options hash.
+
+- **direction**: Direction of the relation. Possible values: ``both``
+  (source relates to targte and target relates to source),
+  ``incoming`` (target relates to source) and ``outgoing`` (source
+relates to target)
+- **meta**: An object with meta information on this relationship. This object overwrites any existing meta information.
+
+#### Response
+
+HTTP status code 200 if the relation exists. HTTP status code 404 if not.
+
+##### Body
+
+JSON encoded array of objects which contains the new meta information (might be 2 elements when changing a relationship in ``both``directions):
+
+```javascript
+[
+  {
+    "source": "peter",
+    "target": "chess",
+    "relation: "plays",
+    "meta": {
+      "location": "Rome"
+    }
+  }
+]
+```
+
+#### Example
+
+To change Peter's location where plays chess from Paris to Rome ``PUT`` to: ``/entities/peter/plays/chess`` with the body ``{"direction": "outgoing", "meta": {"location": "Rome"}``.
 
 ### Delete an existing relationship
 
@@ -124,7 +198,27 @@ JSON encoded options hash.
 
 ##### Body
 
-A JSON encoded array of UUIDs of the related entities.
+A JSON encoded object of the related entities:
+
+```javsacript
+[
+  {
+    "source": "peter",
+    "target": "chess",
+    "relation: "plays",
+    "meta": {
+      "location": "Paris"
+    }
+  },
+  {
+    "source": "peter",
+    "target": "poker",
+    "relation: "plays",
+    "meta": {
+    }
+  }
+]
+```
 
 #### Example
 

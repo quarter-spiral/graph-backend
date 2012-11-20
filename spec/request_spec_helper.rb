@@ -76,3 +76,11 @@ OAUTH_TOKEN = auth_helpers.get_token
 def token
   token = OAUTH_TOKEN
 end
+
+def has_role?(uuid, role)
+  JSON.parse(client.get("/v1/roles/#{role}").body).include? @entity1
+end
+
+def is_related?(uuid1, uuid2, relationship_type = 'test_relates')
+  client.get("/v1/entities/#{uuid1}/#{relationship_type}/#{uuid2}").status == 200
+end

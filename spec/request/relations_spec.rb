@@ -1,11 +1,7 @@
 require_relative '../request_spec_helper.rb'
 
-def has_role?(uuid, role)
-  JSON.parse(client.get("/v1/roles/#{role}").body).include? @entity1
-end
-
-def is_related?(uuid1, uuid2, relationship_type = 'test_relates')
-  client.get("/v1/entities/#{uuid1}/#{relationship_type}/#{uuid2}").status == 200
+def find_in_relationships(relationships, uuid)
+  relationships.detect {|relationship| relationship['target'] == uuid}
 end
 
 describe Graph::Backend::API do
@@ -22,14 +18,6 @@ describe Graph::Backend::API do
     Graph::Backend::Relations::TestRelates.reset!
   end
 
-  it "can't access the api unauthenticated" do
-    client.post("/v1/entities/#{@entity1}/roles/developer").status.must_equal 403
-    client.get("/v1/entities/#{@entity1}/roles").status.must_equal 403
-    client.post("/v1/entities/#{@entity1}/test_relates/#{@entity2}").status.must_equal 403
-    client.get("/v1/entities/#{@entity1}/test_relates").status.must_equal 403
-    client.delete("/v1/entities/#{@entity1}/roles/developer").status.must_equal 403
-  end
-
   describe "authenticated" do
     before do
       AuthenticationInjector.token = token
@@ -39,54 +27,34 @@ describe Graph::Backend::API do
       AuthenticationInjector.reset!
     end
 
-    describe "roles" do
-      it "can add roles to an entity" do
-        has_role?(@entity1, 'developer').must_equal false
-        client.post "/v1/entities/#{@entity1}/roles/developer"
-        has_role?(@entity1, 'developer').must_equal true
-      end
-
-      it "can remove roles of an entity" do
-        has_role?(@entity1, 'developer').must_equal false
-        client.post   "/v1/entities/#{@entity1}/roles/developer"
-        client.delete "/v1/entities/#{@entity1}/roles/developer"
-        has_role?(@entity1, 'developer').must_equal false
-      end
-
-      it "returns an error when trying to add a non-exisitng role" do
-        response = client.post "/v1/entities/#{@entity1}/roles/mehmehmeh"
-        response.status.wont_equal 201
-        JSON.parse(response.body)['error'].wont_be_nil
-      end
-
-      it "can retrieve the roles of an entity" do
-        response = client.get "/v1/entities/#{@entity1}/roles"
-        JSON.parse(response.body).wont_include 'developer'
-        client.post   "/v1/entities/#{@entity1}/roles/developer"
-        response = client.get "/v1/entities/#{@entity1}/roles"
-        JSON.parse(response.body).must_include 'developer'
-      end
-    end
-
     describe "relations" do
       describe "can be created" do
         it "outgoing" do
           is_related?(@entity1, @entity2).must_equal false
-          client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}"
+          response = client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}"
+          JSON.parse(response.body).must_equal([{"source" => @entity1, "target" => @entity2, "relation" => "test_relates", "meta" => {}}])
+
           is_related?(@entity1, @entity2).must_equal true
           is_related?(@entity2, @entity1).must_equal false
         end
 
         it "incoming" do
           is_related?(@entity1, @entity2).must_equal false
-          client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}", {}, JSON.dump(direction: 'incoming')
+          response = client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}", {}, JSON.dump(direction: 'incoming')
+          JSON.parse(response.body).must_equal([{"source" => @entity2, "target" => @entity1, "relation" => "test_relates", "meta" => {}}])
+
           is_related?(@entity1, @entity2).must_equal false
           is_related?(@entity2, @entity1).must_equal true
         end
 
         it "both ways" do
           is_related?(@entity1, @entity2).must_equal false
-          client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}", {}, JSON.dump(direction: 'both')
+          response = client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}", {}, JSON.dump(direction: 'both')
+          relations = JSON.parse(response.body)
+          relations.size.must_equal 2
+          relations.must_include("source" => @entity1, "target" => @entity2, "relation" => "test_relates", "meta" => {})
+          relations.must_include("source" => @entity2, "target" => @entity1, "relation" => "test_relates", "meta" => {})
+
           is_related?(@entity1, @entity2).must_equal true
           is_related?(@entity2, @entity1).must_equal true
         end
@@ -97,6 +65,12 @@ describe Graph::Backend::API do
           response = client.post "/v1/entities/#{@entity2}/test_relates/#{@entity1}", {}, JSON.dump(direction: 'incoming')
           response.status.must_equal 304
         end
+      end
+
+      it "can be checked and retrieved" do
+        client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}"
+        response = client.get "/v1/entities/#{@entity1}/test_relates/#{@entity2}"
+        JSON.parse(response.body).must_equal("source" => @entity1, "target" => @entity2, "relation" => "test_relates", "meta" => {})
       end
 
       it "can be deleted" do
@@ -141,13 +115,12 @@ describe Graph::Backend::API do
         client.post "/v1/entities/#{@entity2}/test_relates/#{@entity4}"
 
         games_of_entity_1 = JSON.parse(client.get("/v1/entities/#{@entity1}/test_relates").body)
-        games_of_entity_1.must_include @entity2
-        games_of_entity_1.must_include @entity3
-
+        find_in_relationships(games_of_entity_1, @entity2).wont_be_nil
+        find_in_relationships(games_of_entity_1, @entity3).wont_be_nil
 
         games_of_entity_2 = JSON.parse(client.get("/v1/entities/#{@entity2}/test_relates").body)
-        games_of_entity_2.must_include @entity1
-        games_of_entity_2.must_include @entity4
+        find_in_relationships(games_of_entity_2, @entity1).wont_be_nil
+        find_in_relationships(games_of_entity_2, @entity4).wont_be_nil
 
         games_of_entity_3 = JSON.parse(client.get("/v1/entities/#{@entity3}/test_relates").body)
         games_of_entity_3.empty?.must_equal true
@@ -165,13 +138,14 @@ describe Graph::Backend::API do
         client.post "/v1/entities/#{@entity4}/test_relates/#{@entity1}"
 
         relations = JSON.parse(client.get("/v1/entities/#{@entity2}/test_relates", {}, JSON.dump(direction: 'incoming')).body)
-        relations.must_include(@entity1)
-        relations.wont_include(@entity2)
-        relations.must_include(@entity3)
-        relations.wont_include(@entity4)
+        find_in_relationships(relations, @entity1).wont_be_nil
+        find_in_relationships(relations, @entity2).must_be_nil
+        find_in_relationships(relations, @entity3).wont_be_nil
+        find_in_relationships(relations, @entity4).must_be_nil
 
         relations = JSON.parse(client.get("/v1/entities/#{@entity1}/test_relates", {}, JSON.dump(direction: 'incoming')).body)
-        relations.must_equal [@entity4]
+        relations.size.must_equal 1
+        find_in_relationships(relations, @entity4).wont_be_nil
       end
 
       it "can list two way related entities" do
@@ -183,16 +157,16 @@ describe Graph::Backend::API do
         client.post "/v1/entities/#{@entity4}/test_relates/#{@entity1}"
 
         relations = JSON.parse(client.get("/v1/entities/#{@entity2}/test_relates", {}, JSON.dump(direction: 'both')).body)
-        relations.must_include(@entity1)
-        relations.wont_include(@entity2)
-        relations.must_include(@entity3)
-        relations.wont_include(@entity4)
+        find_in_relationships(relations, @entity1).wont_be_nil
+        find_in_relationships(relations, @entity2).must_be_nil
+        find_in_relationships(relations, @entity3).wont_be_nil
+        find_in_relationships(relations, @entity4).must_be_nil
 
         relations = JSON.parse(client.get("/v1/entities/#{@entity1}/test_relates", {}, JSON.dump(direction: 'both')).body)
-        relations.wont_include(@entity1)
-        relations.must_include(@entity2)
-        relations.wont_include(@entity3)
-        relations.must_include(@entity4)
+        find_in_relationships(relations, @entity1).must_be_nil
+        find_in_relationships(relations, @entity2).wont_be_nil
+        find_in_relationships(relations, @entity3).must_be_nil
+        find_in_relationships(relations, @entity4).wont_be_nil
       end
 
       it "can remove nodes with all it's relations" do
@@ -201,14 +175,14 @@ describe Graph::Backend::API do
         client.post "/v1/entities/#{@entity1}/test_relates/#{@entity3}", {}, JSON.dump(direction: 'both')
 
         relations = JSON.parse(client.get("/v1/entities/#{@entity1}/test_relates", {}, JSON.dump(direction: 'both')).body)
-        relations.must_include @entity2
-        relations.must_include @entity3
+        find_in_relationships(relations, @entity2).wont_be_nil
+        find_in_relationships(relations, @entity3).wont_be_nil
 
         relations = JSON.parse(client.get("/v1/entities/#{@entity2}/test_relates", {}, JSON.dump(direction: 'both')).body)
-        relations.must_include @entity1
+        find_in_relationships(relations, @entity1).wont_be_nil
 
         relations = JSON.parse(client.get("/v1/entities/#{@entity3}/test_relates", {}, JSON.dump(direction: 'both')).body)
-        relations.must_include @entity1
+        find_in_relationships(relations, @entity1).wont_be_nil
 
         client.delete "/v1/entities/#{@entity1}"
 
@@ -216,10 +190,10 @@ describe Graph::Backend::API do
         relations.empty?.must_equal true
 
         relations = JSON.parse(client.get("/v1/entities/#{@entity2}/test_relates", {}, JSON.dump(direction: 'both')).body)
-        relations.wont_include @entity1
+        find_in_relationships(relations, @entity1).must_be_nil
 
         relations = JSON.parse(client.get("/v1/entities/#{@entity3}/test_relates", {}, JSON.dump(direction: 'both')).body)
-        relations.wont_include @entity1
+        find_in_relationships(relations, @entity1).must_be_nil
       end
 
       describe "valiation mechanism" do
