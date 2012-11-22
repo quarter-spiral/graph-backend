@@ -58,7 +58,11 @@ module Graph::Backend
 
     def self.set_roles(node, roles)
       if roles.empty?
-        connection.remove_node_properties(node, 'roles')
+        begin
+          connection.remove_node_properties(node, 'roles')
+        rescue Neography::NoSuchPropertyException => e
+          # Do nothing as this entity already has no roles
+        end
       else
         connection.set_node_properties(node, 'roles' => roles.uniq)
       end

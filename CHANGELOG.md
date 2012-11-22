@@ -1,3 +1,7 @@
+# 0.0.12 WIP
+
+* Adds a first version of a relationship metadata concept
+
 # 0.0.11
 
 * Eases the dependency on grape

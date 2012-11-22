@@ -18,6 +18,29 @@ module Graph::Backend
       def not_found!
         error!('Not found', 404)
       end
+
+      def extract_meta_information
+        meta = params[:meta]
+        return {} unless meta
+        raise Error.new("Meta information must be an object!") unless meta.kind_of?(Hash)
+        meta.to_hash
+      end
+
+      def relationship_type
+        params[:relationship]
+      end
+
+      def uuid1
+        params[:uuid1]
+      end
+
+      def uuid2
+        params[:uuid2]
+      end
+
+      def direction
+        params[:direction]
+      end
     end
 
     before do
@@ -60,13 +83,27 @@ module Graph::Backend
 
       get "/:uuid1/:relationship/:uuid2" do
         not_found! unless Relation.exists?(params[:relationship], params[:uuid1], params[:uuid2])
-        Relation.new(params[:uuid1], params[:uuid2], params[:relationship]).to_json
+        relation = Relation.get(relationship_type, uuid1, uuid2)
+        meta = Relation.get_meta_data(relation)
+        Relation.new(params[:uuid1], params[:uuid2], params[:relationship], meta).to_hash
       end
 
       post "/:uuid1/:relationship/:uuid2" do
-        throw(:error, :status => 304) if Relation.exists?(params[:relationship], params[:uuid1], params[:uuid2], params[:direction])
-        relations = Relation.create(params[:relationship], params[:uuid1], params[:uuid2], params[:direction])
-        relations.map &:to_json
+        if Relation.exists?(relationship_type, uuid1, uuid2, direction)
+          relations = Relation.update_meta(relationship_type, uuid1, uuid2, direction, extract_meta_information, merge: true)
+          status 304
+          relations.map &:to_hash
+        else
+          relations = Relation.create(relationship_type, uuid1, uuid2, direction, extract_meta_information)
+          relations.map &:to_hash
+        end
+      end
+
+      put "/:uuid1/:relationship/:uuid2" do
+        not_found! unless Relation.exists?(relationship_type, uuid1, uuid2, direction)
+
+        relations = Relation.update_meta(relationship_type,  uuid1, uuid2, direction, extract_meta_information, merge: false)
+        relations.map &:to_hash
       end
 
       delete "/:uuid1/:relationship/:uuid2" do

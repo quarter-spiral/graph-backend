@@ -169,6 +169,57 @@ describe Graph::Backend::API do
         find_in_relationships(relations, @entity4).wont_be_nil
       end
 
+      it "can have meta information" do
+        @entity3 = UUID.new.generate
+        client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}", {}, JSON.dump(meta: {some: 123, attribute: "yeah"})
+        client.post "/v1/entities/#{@entity1}/test_relates/#{@entity3}", {}, JSON.dump(meta: {some: "bla", attribute: 456})
+
+        relations = JSON.parse(client.get("/v1/entities/#{@entity1}/test_relates").body)
+        relations.size.must_equal 2
+        entity2_relation = find_in_relationships(relations, @entity2)
+        entity2_relation['meta'].must_equal("some" => 123, "attribute" => "yeah")
+        entity3_relation = find_in_relationships(relations, @entity3)
+        entity3_relation['meta'].must_equal("some" => "bla", "attribute" => 456)
+      end
+
+      it "meta information will be merged when posting twice" do
+        client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}", {}, JSON.dump(meta: {some: 123, venueFacebook: true})
+        client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}", {}, JSON.dump(meta: {bla: "456", venueFacebook: false})
+
+        relations = JSON.parse(client.get("/v1/entities/#{@entity1}/test_relates").body)
+        relations.size.must_equal 1
+        entity2_relation = find_in_relationships(relations, @entity2)
+        entity2_relation['meta'].must_equal("some" => 123, "bla" => "456", "venueFacebook" => false)
+      end
+
+      it "responds with 404 when changing a non-existent relation" do
+        response = client.put "/v1/entities/#{@entity1}/test_relates/#{@entity2}", {}, JSON.dump(meta: {yo: 123})
+        response.status.must_equal 404
+
+        response = client.get "/v1/entities/#{@entity1}/test_relates/#{@entity2}"
+        response.status.must_equal 404
+      end
+
+      it "can update the meta information" do
+        response = client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}", {}, JSON.dump(direction: 'both', meta: {some: 123, venueFacebook: true})
+        relations = JSON.parse(response.body)
+        relations.size.must_equal 2
+        relations.each {|r| r['meta'].must_equal "some" => 123, "venueFacebook" => true}
+
+        response = client.put "/v1/entities/#{@entity1}/test_relates/#{@entity2}", {}, JSON.dump(meta: {some: "bla"})
+        relations = JSON.parse(response.body)
+        relations.size.must_equal 1
+        relations.first["meta"].must_equal "some" => "bla"
+
+        response = client.get "/v1/entities/#{@entity1}/test_relates/#{@entity2}"
+        relation = JSON.parse(response.body)
+        relation['meta'].must_equal "some" => "bla"
+
+        response = client.get "/v1/entities/#{@entity2}/test_relates/#{@entity1}"
+        relation = JSON.parse(response.body)
+        relation['meta'].must_equal "some" => 123, "venueFacebook" => true
+      end
+
       it "can remove nodes with all it's relations" do
         @entity3 = UUID.new.generate
         client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}"
