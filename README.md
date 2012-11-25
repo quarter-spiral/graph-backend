@@ -200,7 +200,7 @@ JSON encoded options hash.
 
 A JSON encoded object of the related entities:
 
-```javsacript
+```javascript
 [
   {
     "source": "peter",
@@ -232,6 +232,57 @@ To find out ``Who is playing chess`` send a ``GET`` to:
 
 The response might be: ``["peter"]``.
 
+### Issue advanced queries to the graph
+
+The used query language is Neo4J's [Cypher](http://docs.neo4j.org/chunked/milestone/cypher-query-lang.html). In order to make life a little bit easier the backend is already setting the ``START`` of the query to a node determined by the UUIDs specified.
+
+#### Request
+
+**GET** to ``/query/:UUID-SOURCE-1:/:UUID-SOURCE-2:/…``
+
+##### Parameters
+
+- **UUID-SOURCE-N** [REQUIRED]: The UUID of an entity the query is relating to
+
+##### Body
+
+JSON encoded object.
+
+###### Options
+
+* **``query``**: Contains the *Cypher* query starting with the ``WHERE`` part. The ``START`` is already filled out by the backend in this way: ``START node1 = the_node_with_the_given_uuid_1, node2 = the_node_with_the_given_uuid_2``
+
+#### Response
+
+An JSON encoded array of arrays of whatever you have returned in the Cypher query.
+
+*Hint*: It's very likely that you want to return single UUIDs.
+
+#### Examples
+
+Assuming that **my** user has the UUID ``12345`` and plays a game with the UUID ``67890``.
+
+##### Games that my friends play
+
+**GET** to ``/query/12345`` with the body:
+
+```javascript
+"query": "MATCH node0-[:friends]->friend-[:plays]->game RETURN game.uuid"
+```
+
+##### My friends who play that game, too, on Facebook
+**GET** to ``/query/12345/67890`` with the body:
+
+```javascript
+"query": "MATCH node0-[:friends]->friend-[p:plays]->game WHERE game  = node1 AND p.venueFacebook! = true RETURN DISTINCT friend.uuid"
+```
+
+##### Developers of games my friends play on Facebook
+**GET** to ``/query/12345`` with the body:
+
+```javascript
+"query" => "MATCH node1-[:friends]->()->[:plays]->()<-[:develops]->developer RETURN developer"
+```
 
 ### Remove an entity and all it's relations from the graph
 

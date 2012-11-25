@@ -46,8 +46,8 @@ module Graph::Backend
     before do
       unless request.env['REQUEST_METHOD'] == 'OPTIONS'
         error!('Unauthenticated', 403) unless request.env['HTTP_AUTHORIZATION']
-        token = request.env['HTTP_AUTHORIZATION'].gsub(/^Bearer\s+/, '')
-        error!('Unauthenticated', 403) unless connection.auth.token_valid?(token)
+        @token = request.env['HTTP_AUTHORIZATION'].gsub(/^Bearer\s+/, '')
+        error!('Unauthenticated', 403) unless connection.auth.token_valid?(@token)
       end
     end
 
@@ -114,6 +114,13 @@ module Graph::Backend
       get "/:uuid1/:relationship" do
         Relation.list_for(params[:relationship], params[:uuid1], params[:direction])
       end
+    end
+
+    get "/query/*path" do
+      uuids = env['PATH_INFO'].gsub(/^.*\/query\//, '').split('/')
+      query = Query.new(uuids, params[:query])
+      result = connection.neo4j.execute_query(query.to_cypher)['data']
+      result
     end
   end
 end

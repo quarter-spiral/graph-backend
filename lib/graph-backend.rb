@@ -12,6 +12,7 @@ require "graph-backend/connection"
 require "graph-backend/node"
 require "graph-backend/relations"
 require "graph-backend/relation"
+require "graph-backend/query"
 require "graph-backend/api"
 
 ENV['RACK_ENV'] ||= 'development'

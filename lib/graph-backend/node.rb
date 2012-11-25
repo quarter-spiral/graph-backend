@@ -39,6 +39,10 @@ module Graph::Backend
       connection.delete_node!(node)
     end
 
+    def self.id(node)
+      node['self'].split('/').last
+    end
+
     protected
     def self.connection
       @connection ||= Connection.create.neo4j

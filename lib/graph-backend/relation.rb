@@ -1,6 +1,6 @@
 module Graph::Backend
   class Relation
-    RELATIONSHIP_TYPES = ['develops', 'friends']
+    RELATIONSHIP_TYPES = ['develops', 'friends', 'plays']
     DIRECTIONS = ['incoming', 'outgoing', 'both']
 
     attr_reader :uuid_source, :uuid_target, :relation, :meta
