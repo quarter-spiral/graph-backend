@@ -1,4 +1,4 @@
-# 0.0.14 WIP
+# 0.0.14
 
 * Improves the response status codes for creating new relationships
 
