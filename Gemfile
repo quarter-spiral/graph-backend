@@ -13,7 +13,7 @@ group :development, :test do
   gem 'uuid'
   gem 'rake'
 
-  gem 'auth-backend', "~> 0.0.14"
+  gem 'auth-backend', "~> 0.0.15"
   gem 'nokogiri'
   gem 'sqlite3'
   gem 'sinatra_warden', git: 'https://github.com/quarter-spiral/sinatra_warden.git'
