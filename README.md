@@ -39,7 +39,8 @@ relates to target)
 #### Response
 
 Will return status code 201 when created and 304 if the relation exists
-already.
+already. If the relation exists but meta data was updated status code
+200 is returned instead.
 
 ##### Body
 
@@ -138,7 +139,7 @@ JSON encoded array of objects which contains the new meta information (might be 
   {
     "source": "peter",
     "target": "chess",
-    "relation: "plays",
+    "relation": "plays",
     "meta": {
       "location": "Rome"
     }
@@ -250,7 +251,7 @@ JSON encoded object.
 
 ###### Options
 
-* **``query``**: Contains the *Cypher* query starting with the ``WHERE`` part. The ``START`` is already filled out by the backend in this way: ``START node1 = the_node_with_the_given_uuid_1, node2 = the_node_with_the_given_uuid_2``
+* **query**: Contains the *Cypher* query starting with the ``WHERE`` part. The ``START`` is already filled out by the backend in this way: ``START node1 = the_node_with_the_given_uuid_1, node2 = the_node_with_the_given_uuid_2``
 
 #### Response
 

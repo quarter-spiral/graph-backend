@@ -91,7 +91,7 @@ module Graph::Backend
       post "/:uuid1/:relationship/:uuid2" do
         if Relation.exists?(relationship_type, uuid1, uuid2, direction)
           relations = Relation.update_meta(relationship_type, uuid1, uuid2, direction, extract_meta_information, merge: true)
-          status 304
+          status(relations.any? {|r| r.dirty?} ? 200 : 304)
           relations.map &:to_hash
         else
           relations = Relation.create(relationship_type, uuid1, uuid2, direction, extract_meta_information)

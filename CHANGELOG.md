@@ -1,3 +1,7 @@
+# 0.0.14 WIP
+
+* Improves the response status codes for creating new relationships
+
 # 0.0.13
 
 * Adds the query API

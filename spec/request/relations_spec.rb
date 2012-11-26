@@ -65,6 +65,20 @@ describe Graph::Backend::API do
           response = client.post "/v1/entities/#{@entity2}/test_relates/#{@entity1}", {}, JSON.dump(direction: 'incoming')
           response.status.must_equal 304
         end
+
+        it "returns 200 when post is issued, the relation exist but the metadata is updated" do
+          response = client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}", {}, JSON.dump(meta: {venueFacebook: true})
+          response.status.must_equal 201
+
+          response = client.post "/v1/entities/#{@entity2}/test_relates/#{@entity1}", {}, JSON.dump(direction: 'incoming', meta: {venueFacebook: true})
+          response.status.must_equal 304
+
+          response = client.post "/v1/entities/#{@entity2}/test_relates/#{@entity1}", {}, JSON.dump(direction: 'incoming', meta: {venueSpiralGalaxy: true})
+          response.status.must_equal 200
+
+          response = client.post "/v1/entities/#{@entity2}/test_relates/#{@entity1}", {}, JSON.dump(direction: 'incoming', meta: {venueFacebook: true})
+          response.status.must_equal 304
+        end
       end
 
       it "can be checked and retrieved" do

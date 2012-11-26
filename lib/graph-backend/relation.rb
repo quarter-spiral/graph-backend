@@ -21,6 +21,14 @@ module Graph::Backend
       }
     end
 
+    def dirty!
+      @dirty = true
+    end
+
+    def dirty?
+      @dirty
+    end
+
     def self.create(relationship_type, uuid1, uuid2, direction, meta = {})
       direction ||= 'outgoing'
       ensure_relationship_type_exists(relationship_type)
@@ -82,13 +90,17 @@ module Graph::Backend
       direction ||= 'outgoing'
       if direction == 'outgoing' || direction == 'both'
         relationship = get(relationship_type, uuid1, uuid2)
-        new_meta = self.set_meta_data(relationship, meta, options[:merge])
-        relations << Relation.new(uuid1, uuid2, relationship_type, new_meta)
+        old_meta, new_meta = self.set_meta_data(relationship, meta, options[:merge])
+        relation =  Relation.new(uuid1, uuid2, relationship_type, new_meta)
+        relation.dirty! if new_meta != old_meta
+        relations << relation
       end
       if direction == 'incoming' || direction == 'both'
         relationship = get(relationship_type, uuid2, uuid1)
-        new_meta = self.set_meta_data(relationship, meta, options[:merge])
-        relations << Relation.new(uuid2, uuid1, relationship_type, meta)
+        old_meta, new_meta = self.set_meta_data(relationship, meta, options[:merge])
+        relation = Relation.new(uuid2, uuid1, relationship_type, meta)
+        relation.dirty! if new_meta != old_meta
+        relations << relation
       end
       relations
     end
@@ -115,12 +127,12 @@ module Graph::Backend
       old_meta = connection.get_relationship_properties(relationship) || {}
       connection.set_relationship_properties(relationship, meta)
       if merge
-        old_meta.merge(meta)
+        [old_meta, old_meta.merge(meta)]
       else
         properties_to_remove = old_meta.keys - meta.keys
         connection.remove_relationship_properties(relationship, properties_to_remove)
 
-        meta
+        [old_meta, meta]
       end
     end
 
