@@ -130,7 +130,9 @@ module Graph::Backend
         [old_meta, old_meta.merge(meta)]
       else
         properties_to_remove = old_meta.keys - meta.keys
-        connection.remove_relationship_properties(relationship, properties_to_remove)
+        unless properties_to_remove.empty?
+          connection.remove_relationship_properties(relationship, properties_to_remove)
+        end
 
         [old_meta, meta]
       end

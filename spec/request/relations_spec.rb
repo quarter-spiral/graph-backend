@@ -234,6 +234,14 @@ describe Graph::Backend::API do
         relation['meta'].must_equal "some" => 123, "venueFacebook" => true
       end
 
+      it "does not lose meta data when changing the exact same keys to different values" do
+        client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}", {}, JSON.dump(meta: {some: 123})
+        client.put "/v1/entities/#{@entity1}/test_relates/#{@entity2}", {}, JSON.dump(meta: {some: 456})
+        response = client.get "/v1/entities/#{@entity1}/test_relates/#{@entity2}"
+        relation = JSON.parse(response.body)
+        relation['meta'].must_equal "some" => 456
+      end
+
       it "can remove nodes with all it's relations" do
         @entity3 = UUID.new.generate
         client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}"

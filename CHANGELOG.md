@@ -1,3 +1,7 @@
+# 0.0.15 WIP
+
+* Fixes bug that deleted relationship's meta data instead of updating it
+
 # 0.0.14
 
 * Improves the response status codes for creating new relationships
