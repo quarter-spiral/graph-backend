@@ -1,4 +1,4 @@
-# 0.0.15 WIP
+# 0.0.15
 
 * Fixes bug that deleted relationship's meta data instead of updating it
 
