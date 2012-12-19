@@ -1,3 +1,7 @@
+# 0.0.16 WIP
+
+* Adds Newrelic monitoring and ping middleware
+
 # 0.0.15
 
 * Fixes bug that deleted relationship's meta data instead of updating it
