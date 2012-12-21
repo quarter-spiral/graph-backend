@@ -1,7 +1,9 @@
 require 'grape'
+require 'grape_newrelic'
 
 module Graph::Backend
   class API < ::Grape::API
+    use GrapeNewrelic::Instrumenter
     version 'v1', :using => :path, :vendor => 'quarter-spiral'
 
     format :json
