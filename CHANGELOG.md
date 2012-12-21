@@ -1,4 +1,4 @@
-# 0.0.17 WIP
+# 0.0.17
 
 * Improve Newrelic instrumenting
 
