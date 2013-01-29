@@ -24,6 +24,7 @@ module Graph::Backend
       roles = get_roles(node)
       roles << role
       set_roles(node, roles)
+      true
     end
 
     def self.remove_role(uuid_or_node, role)
@@ -32,6 +33,7 @@ module Graph::Backend
       roles = get_roles(node)
       roles.delete role
       set_roles(node, roles)
+      true
     end
 
     def self.delete(uuid_or_node)

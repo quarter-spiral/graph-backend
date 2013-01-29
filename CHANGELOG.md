@@ -1,3 +1,7 @@
+# 0.0.18 WIP
+
+* Makes return value of #add_role / #remove_role way simpler
+
 # 0.0.17
 
 * Improve Newrelic instrumenting
