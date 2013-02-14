@@ -14,7 +14,11 @@ module Graph::Backend
 
     def self.get_roles(uuid_or_node)
       node = get_node(uuid_or_node)
-      connection.get_node_properties(node)['roles'] || []
+      if node.kind_of?(Hash) && node['data'] && node['data']['roles']
+        node['data']['roles']
+      else
+        connection.get_node_properties(node)['roles'] || []
+      end
     end
 
     def self.add_role(uuid_or_node, role)

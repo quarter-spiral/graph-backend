@@ -36,7 +36,6 @@ module Graph::Backend
       ensure_relationship_is_valid(relationship_type, uuid1, uuid2, direction)
 
       relations = []
-
       if ['incoming', 'both'].include?(direction)
         relationship = connection.create_relationship(relationship_type, Node.find_or_create(uuid2), Node.find_or_create(uuid1))
         connection.reset_relationship_properties(relationship, meta)
@@ -142,9 +141,8 @@ module Graph::Backend
       node = Node.find_or_create(uuid)
       relationships = connection.get_node_relationships(node, 'outgoing')
       get_ends(node, relationships).each do |relationship, other_end|
-        other_uuid = other_end['body']['data']['uuid']
         begin
-          ensure_relationship_is_valid(relationship['type'], uuid, other_uuid, 'outgoing')
+          ensure_relationship_is_valid(relationship['type'], node, other_end['body'], 'outgoing')
         rescue Error
           connection.delete_relationship(relationship)
         end
@@ -185,6 +183,11 @@ module Graph::Backend
 
     def self.get_ends(node, relationships)
       jobs = (relationships || []).map {|r| [:get_node, other_end(r, node)]}
+      (relationships || []).zip(connection.batch(*jobs))
+    end
+
+    def self.get_properties(node, relationships)
+      jobs = (relationships || []).map {|r| [:get_node_properties, other_end(r, node)]}
       (relationships || []).zip(connection.batch(*jobs))
     end
 
