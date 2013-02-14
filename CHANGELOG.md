@@ -1,4 +1,4 @@
-# 0.0.19 WIP
+# 0.0.19
 
 * Improves the Node#add_role performance a lot
 * Makes return value of #add_role / #remove_role way simpler
