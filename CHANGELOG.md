@@ -1,4 +1,4 @@
-# 0.0.20 WIP
+# 0.0.20
 
 * Fixed a regression that occurred with the Neo4J/neography update
 
