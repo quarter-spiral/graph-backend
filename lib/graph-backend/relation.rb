@@ -79,7 +79,7 @@ module Graph::Backend
 
     def self.get(relationship_type, uuid1, uuid2)
       ensure_relationship_type_exists(relationship_type)
-      relationship = get_paths(relationship_type, uuid1, uuid2).first
+      relationship = get_paths(relationship_type, uuid1, uuid2).sort {|a,b| a['relationships'].first.split('/').last.to_i <=> b['relationships'].first.split('/').last.to_i}.first
       return unless relationship
       relationship['relationships'].first
     end
@@ -178,7 +178,7 @@ module Graph::Backend
     end
 
     def self.get_paths(relationship_type, uuid1, uuid2)
-      connection.get_paths(Node.find_or_create(uuid1), Node.find_or_create(uuid2), {"type"=> relationship_type, "direction" => "out"}, 1)
+      connection.get_paths(Node.find_or_create(uuid1), Node.find_or_create(uuid2), {"type"=> relationship_type, "direction" => "out"}, 2).select {|e| e['nodes'].length == 2}
     end
 
     def self.get_ends(node, relationships)

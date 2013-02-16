@@ -1,3 +1,7 @@
+# 0.0.20 WIP
+
+* Fixed a regression that occurred with the Neo4J/neography update
+
 # 0.0.19
 
 * Improves the Node#add_role performance a lot
