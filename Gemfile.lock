@@ -21,7 +21,7 @@ PATH
   specs:
     graph-backend (0.0.21)
       auth-client (>= 0.0.14)
-      grape (= 0.2.2)
+      grape (= 0.2.3.qs)
       grape_newrelic (~> 0.0.3)
       json (~> 1.7.7)
       neography (= 1.0.6)
@@ -80,7 +80,7 @@ GEM
     eventmachine (1.0.0-java)
     faraday (0.8.1)
       multipart-post (~> 1.1)
-    grape (0.2.2)
+    grape (0.2.3.qs)
       activesupport
       hashie (~> 1.2)
       multi_json (>= 1.3.2)
