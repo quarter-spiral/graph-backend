@@ -1,3 +1,7 @@
+# 0.0.21 WIP
+
+* Updates JSON to 1.7.7
+
 # 0.0.20
 
 * Fixed a regression that occurred with the Neo4J/neography update
