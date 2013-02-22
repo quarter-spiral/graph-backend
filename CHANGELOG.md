@@ -1,4 +1,4 @@
-# 0.0.21 WIP
+# 0.0.21
 
 * Updates JSON to 1.7.7
 
