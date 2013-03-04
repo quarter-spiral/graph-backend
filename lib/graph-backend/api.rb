@@ -9,8 +9,19 @@ module Graph::Backend
     format :json
     default_format :json
 
-    rescue_from Graph::Backend::Error
     error_format :json
+
+    rescue_from :all do |e|
+      if ENV['RACK_ENV'] == 'development' || ENV['RACK_ENV'] == 'production'
+        $stderr.puts "#{e.message}\n\n#{e.backtrace.join("\n")}"
+      end
+
+      if e.kind_of?(Graph::Backend::Error)
+        Rack::Response.new({error: e.message, backtrace: e.backtrace}.to_json, 500, { 'Content-type' => 'application/json' }).finish
+      else
+        raise e
+      end
+    end
 
     helpers do
       def connection

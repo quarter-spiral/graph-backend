@@ -114,7 +114,7 @@ module Graph::Backend
       relationships = connection.get_node_relationships(node, direction, relationship_type)
       get_ends(node, relationships).map do |relationship, node|
         meta = get_meta_data(relationship)
-        Relation.new(uuid, node['body']['data']['uuid'], relationship_type, meta).to_hash
+        Relation.new(uuid, node['data']['uuid'], relationship_type, meta).to_hash
       end.uniq
     end
 
@@ -142,7 +142,7 @@ module Graph::Backend
       relationships = connection.get_node_relationships(node, 'outgoing')
       get_ends(node, relationships).each do |relationship, other_end|
         begin
-          ensure_relationship_is_valid(relationship['type'], node, other_end['body'], 'outgoing')
+          ensure_relationship_is_valid(relationship['type'], node, other_end, 'outgoing')
         rescue Error
           connection.delete_relationship(relationship)
         end
@@ -182,8 +182,13 @@ module Graph::Backend
     end
 
     def self.get_ends(node, relationships)
-      jobs = (relationships || []).map {|r| [:get_node, other_end(r, node)]}
-      (relationships || []).zip(connection.batch(*jobs))
+      ids = (relationships || []).map {|r| other_end(r, node).split('/').last.to_i}
+      results = []
+      unless ids.empty?
+        query = "START n = node(#{ids.join(',')}) return n"
+        results = connection.execute_query(query)['data'].map(&:first)
+      end
+      (relationships || []).zip(results)
     end
 
     def self.get_properties(node, relationships)

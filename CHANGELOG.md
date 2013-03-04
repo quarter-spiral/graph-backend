@@ -1,3 +1,7 @@
+# 0.0.23 WIP
+
+* Fixes problems with modifying roles on entities with a lot of relations
+
 # 0.0.22
 
 * Updates grape
