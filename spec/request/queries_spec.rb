@@ -1,9 +1,11 @@
 require_relative '../request_spec_helper.rb'
+require 'cgi'
 
 def query(uuids, query)
   uuids = Array(uuids)
   url = (["/v1/query"] + uuids).join('/')
-  response = client.get(url, {}, JSON.dump(query: query))
+  url += "?query=" + CGI.escape(query)
+  response = client.get(url, {})
   JSON.parse(response.body)
 end
 
@@ -86,7 +88,6 @@ describe Graph::Backend::API do
       end
 
       it "can query for friends of a player that plays a given game on a given venue" do
-
         friends = query([@player1, @game1], "MATCH node0-[:friends]->friend-[p:plays]->game WHERE game = node1 AND p.venueFacebook! = true RETURN DISTINCT friend.uuid")
 
         friends.size.must_equal(2)

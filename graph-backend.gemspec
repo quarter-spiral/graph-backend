@@ -15,10 +15,10 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = Graph::Backend::VERSION
 
-  gem.add_dependency 'grape', '0.2.3.qs'
+  gem.add_dependency 'grape', '~> 0.4.0'
   gem.add_dependency 'json', '~> 1.7.7'
-  gem.add_dependency 'neography', '1.0.6'
+  gem.add_dependency 'neography', '1.0.9'
   gem.add_dependency 'auth-client', '>=0.0.14'
   gem.add_dependency 'ping-middleware', '~> 0.0.2'
-  gem.add_dependency 'grape_newrelic', '~> 0.0.3'
+  gem.add_dependency 'grape_newrelic', '~> 0.0.4'
 end

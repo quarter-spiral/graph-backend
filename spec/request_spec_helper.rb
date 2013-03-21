@@ -2,6 +2,7 @@ require_relative './spec_helper'
 
 require 'json'
 require 'uuid'
+require 'cgi'
 require 'rack/client'
 
 include Graph::Backend
@@ -32,6 +33,18 @@ class AuthenticationInjector
   end
 end
 
+class ContentTypeInjector
+  def initialize(app)
+    @app = app
+  end
+
+  def call(env)
+    env['CONTENT_TYPE'] = 'application/json'
+    env['CONTENT_LENGTH'] = env['rack.input'].length
+    @app.call(env)
+  end
+end
+
 ENV['QS_AUTH_BACKEND_URL'] = 'http://auth-backend.dev'
 
 API_APP  = API.new
@@ -52,14 +65,19 @@ def client
 
   @client = client = Rack::Client.new {
       use AuthenticationInjector
+      use ContentTypeInjector
       run API_APP
   }
 
   def @client.get(url, headers = {}, body = '', &block)
-    request('GET', url, headers, body, {}, &block)
+    params = body && !body.empty? ? JSON.parse(body) : {}
+    url += "?" + params.map {|k,v| "#{CGI.escape(k.to_s)}=#{CGI.escape(v.to_s)}"}.join('&')
+    request('GET', url, headers, nil, {}, &block)
   end
   def @client.delete(url, headers = {}, body = '', &block)
-    request('DELETE', url, headers, body, {}, &block)
+    params = body && !body.empty? ? JSON.parse(body) : {}
+    url += "?" + params.map {|k,v| "#{CGI.escape(k.to_s)}=#{CGI.escape(v.to_s)}"}.join('&')
+    request('DELETE', url, headers, nil, {}, &block)
   end
 
   @client

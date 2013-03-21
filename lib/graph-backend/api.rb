@@ -9,7 +9,7 @@ module Graph::Backend
     format :json
     default_format :json
 
-    error_format :json
+    default_error_formatter :json
 
     rescue_from :all do |e|
       if ENV['RACK_ENV'] == 'development' || ENV['RACK_ENV'] == 'production'
@@ -34,6 +34,7 @@ module Graph::Backend
 
       def extract_meta_information
         meta = params[:meta]
+
         return {} unless meta
         raise Error.new("Meta information must be an object!") unless meta.kind_of?(Hash)
         meta.to_hash

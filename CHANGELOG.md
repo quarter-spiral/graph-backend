@@ -1,3 +1,7 @@
+# 0.0.24 WIP
+
+* Updates grape and neography
+
 # 0.0.23
 
 * Fixes problems with modifying roles on entities with a lot of relations
