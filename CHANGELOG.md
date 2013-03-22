@@ -1,3 +1,7 @@
+# 0.0.25 WIP
+
+* Upgrades auth-backend
+
 # 0.0.24
 
 * Updates grape and neography
