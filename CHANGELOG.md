@@ -1,5 +1,6 @@
 # 0.0.25 WIP
 
+* Transforms empty responses to JSON objects instead of empty strings
 * Upgrades auth-backend
 
 # 0.0.24

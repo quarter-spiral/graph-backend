@@ -55,6 +55,10 @@ module Graph::Backend
       def direction
         params[:direction]
       end
+
+      def empty_body
+        {}
+      end
     end
 
     before do
@@ -78,7 +82,7 @@ module Graph::Backend
     namespace '/entities' do
       delete "/:uuid" do
         Node.delete(params[:uuid])
-        ''
+        empty_body
       end
 
       get "/:uuid/roles" do
@@ -87,12 +91,12 @@ module Graph::Backend
 
       post "/:uuid/roles/:role" do
         Node.add_role(params[:uuid], params[:role])
-        ''
+        empty_body
       end
 
       delete "/:uuid/roles/:role" do
         Node.remove_role(params[:uuid], params[:role])
-        ''
+        empty_body
       end
 
       get "/:uuid1/:relationship/:uuid2" do
@@ -122,7 +126,7 @@ module Graph::Backend
 
       delete "/:uuid1/:relationship/:uuid2" do
         not_found! unless Relation.delete(params[:relationship], params[:uuid1], params[:uuid2])
-        ''
+        empty_body
       end
 
       get "/:uuid1/:relationship" do
