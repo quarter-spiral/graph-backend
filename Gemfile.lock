@@ -19,7 +19,7 @@ GIT
 PATH
   remote: .
   specs:
-    graph-backend (0.0.24)
+    graph-backend (0.0.25)
       auth-client (>= 0.0.14)
       grape (~> 0.4.0)
       grape_newrelic (~> 0.0.4)
