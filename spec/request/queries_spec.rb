@@ -42,7 +42,7 @@ describe Graph::Backend::API do
 
   describe "authenticated" do
     before do
-      AuthenticationInjector.token = token
+      AuthenticationInjector.token = APP_TOKEN
 
       @player1 = UUID.new.generate
       client.post "/v1/entities/#{@player1}/roles/player"

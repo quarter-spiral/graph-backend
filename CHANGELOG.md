@@ -1,3 +1,7 @@
+# 0.0.26 WIP
+
+* Adds authorization
+
 # 0.0.25
 
 * Transforms empty responses to JSON objects instead of empty strings

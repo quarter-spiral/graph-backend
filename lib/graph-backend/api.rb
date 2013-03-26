@@ -59,13 +59,38 @@ module Graph::Backend
       def empty_body
         {}
       end
+
+      def own_data?(uuid)
+        @token_owner['uuid'] == uuid
+      end
+
+      def system_level_privileges?
+        @token_owner['type'] == 'app'
+      end
+
+      def is_authorized_to_access?(uuid)
+        system_level_privileges? || own_data?(uuid)
+      end
+
+      def prevent_access!
+        error!('Unauthenticated', 403)
+      end
+
+      def owner_only!(uuid = params[:uuid])
+        prevent_access! unless is_authorized_to_access?(uuid)
+      end
+
+      def system_privileges_only!
+        prevent_access! unless system_level_privileges?
+      end
     end
 
     before do
       unless request.env['REQUEST_METHOD'] == 'OPTIONS'
-        error!('Unauthenticated', 403) unless request.env['HTTP_AUTHORIZATION']
-        @token = request.env['HTTP_AUTHORIZATION'].gsub(/^Bearer\s+/, '')
-        error!('Unauthenticated', 403) unless connection.auth.token_valid?(@token)
+        prevent_access! unless request.env['HTTP_AUTHORIZATION']
+        token = request.env['HTTP_AUTHORIZATION'].gsub(/^Bearer\s+/, '')
+        @token_owner = connection.auth.token_owner(token)
+        prevent_access! unless @token_owner
       end
     end
 
@@ -74,6 +99,8 @@ module Graph::Backend
     end
 
     get "roles/:role" do
+      system_privileges_only!
+
       Node.find_by_role(params[:role]).map do |node|
         node['data']['uuid']
       end
@@ -81,25 +108,35 @@ module Graph::Backend
 
     namespace '/entities' do
       delete "/:uuid" do
+        owner_only!
+
         Node.delete(params[:uuid])
         empty_body
       end
 
       get "/:uuid/roles" do
+        owner_only!
+
         Node.get_roles(params[:uuid])
       end
 
       post "/:uuid/roles/:role" do
+        owner_only!
+
         Node.add_role(params[:uuid], params[:role])
         empty_body
       end
 
       delete "/:uuid/roles/:role" do
+        owner_only!
+
         Node.remove_role(params[:uuid], params[:role])
         empty_body
       end
 
       get "/:uuid1/:relationship/:uuid2" do
+        owner_only!(params[:uuid1])
+
         not_found! unless Relation.exists?(params[:relationship], params[:uuid1], params[:uuid2])
         relation = Relation.get(relationship_type, uuid1, uuid2)
         meta = Relation.get_meta_data(relation)
@@ -107,6 +144,8 @@ module Graph::Backend
       end
 
       post "/:uuid1/:relationship/:uuid2" do
+        system_privileges_only!
+
         if Relation.exists?(relationship_type, uuid1, uuid2, direction)
           relations = Relation.update_meta(relationship_type, uuid1, uuid2, direction, extract_meta_information, merge: true)
           status(relations.any? {|r| r.dirty?} ? 200 : 304)
@@ -118,6 +157,8 @@ module Graph::Backend
       end
 
       put "/:uuid1/:relationship/:uuid2" do
+        system_privileges_only!
+
         not_found! unless Relation.exists?(relationship_type, uuid1, uuid2, direction)
 
         relations = Relation.update_meta(relationship_type,  uuid1, uuid2, direction, extract_meta_information, merge: false)
@@ -125,16 +166,22 @@ module Graph::Backend
       end
 
       delete "/:uuid1/:relationship/:uuid2" do
+        system_privileges_only!
+
         not_found! unless Relation.delete(params[:relationship], params[:uuid1], params[:uuid2])
         empty_body
       end
 
       get "/:uuid1/:relationship" do
+        owner_only!(params[:uuid1])
+
         Relation.list_for(params[:relationship], params[:uuid1], params[:direction])
       end
     end
 
     get "/query/*path" do
+      system_privileges_only!
+
       uuids = env['PATH_INFO'].gsub(/^.*\/query\//, '').split('/')
       query = Query.new(uuids, params[:query])
       result = connection.neo4j.execute_query(query.to_cypher)['data']

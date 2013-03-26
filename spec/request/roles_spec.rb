@@ -16,7 +16,7 @@ describe Graph::Backend::API do
 
   describe "authenticated" do
     before do
-      AuthenticationInjector.token = token
+      AuthenticationInjector.token = APP_TOKEN
     end
 
     after do

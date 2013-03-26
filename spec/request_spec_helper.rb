@@ -4,6 +4,7 @@ require 'json'
 require 'uuid'
 require 'cgi'
 require 'rack/client'
+require 'faraday'
 
 include Graph::Backend
 
@@ -26,7 +27,7 @@ class AuthenticationInjector
 
   def call(env)
     if token = self.class.token
-      env['HTTP_AUTHORIZATION'] = "Bearer #{token}"
+      env['HTTP_AUTHORIZATION'] = "Bearer #{token}" unless env['HTTP_AUTHORIZATION']
     end
 
     @app.call(env)
@@ -71,13 +72,17 @@ def client
 
   def @client.get(url, headers = {}, body = '', &block)
     params = body && !body.empty? ? JSON.parse(body) : {}
-    url += "?" + params.map {|k,v| "#{CGI.escape(k.to_s)}=#{CGI.escape(v.to_s)}"}.join('&')
-    request('GET', url, headers, nil, {}, &block)
+    uri = URI.parse(url)
+    uri.query ||= ''
+    uri.query += "&" + Faraday::Utils.build_nested_query(params)
+    request('GET', uri.to_s, headers, nil, {}, &block)
   end
   def @client.delete(url, headers = {}, body = '', &block)
     params = body && !body.empty? ? JSON.parse(body) : {}
-    url += "?" + params.map {|k,v| "#{CGI.escape(k.to_s)}=#{CGI.escape(v.to_s)}"}.join('&')
-    request('DELETE', url, headers, nil, {}, &block)
+    uri = URI.parse(url)
+    uri.query ||= ''
+    uri.query += "&" + Faraday::Utils.build_nested_query(params)
+    request('DELETE', uri.to_s, headers, nil, {}, &block)
   end
 
   @client
@@ -95,10 +100,15 @@ def token
   token = OAUTH_TOKEN
 end
 
+OAUTH_APP = auth_helpers.create_app!
+APP_TOKEN = auth_helpers.get_app_token(OAUTH_APP[:id], OAUTH_APP[:secret])
+
+OAUTH_USER = auth_helpers.user_data
+
 def has_role?(uuid, role)
-  JSON.parse(client.get("/v1/roles/#{role}").body).include? @entity1
+  JSON.parse(client.get("/v1/roles/#{role}", {"Authorization" => "Bearer #{APP_TOKEN}"}).body).include? uuid
 end
 
 def is_related?(uuid1, uuid2, relationship_type = 'test_relates')
-  client.get("/v1/entities/#{uuid1}/#{relationship_type}/#{uuid2}").status == 200
+  client.get("/v1/entities/#{uuid1}/#{relationship_type}/#{uuid2}", {"Authorization" => "Bearer #{APP_TOKEN}"}).status == 200
 end

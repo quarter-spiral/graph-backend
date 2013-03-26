@@ -14,6 +14,7 @@ group :development, :test do
   gem 'rake'
 
   gem 'auth-backend', "~> 0.0.28"
+  #gem 'auth-backend', path: '../auth-backend'
   gem 'nokogiri'
   gem 'sqlite3'
   gem 'sinatra_warden', git: 'https://github.com/quarter-spiral/sinatra_warden.git'
