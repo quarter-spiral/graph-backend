@@ -1,4 +1,4 @@
-# 0.0.26 WIP
+# 0.0.26 / 2013-04-02
 
 * Adds authorization
 

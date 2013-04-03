@@ -19,7 +19,7 @@ GIT
 PATH
   remote: .
   specs:
-    graph-backend (0.0.25)
+    graph-backend (0.0.26)
       auth-client (>= 0.0.14)
       grape (~> 0.4.0)
       grape_newrelic (~> 0.0.4)
@@ -70,8 +70,8 @@ GEM
       sinatra-flash
       thin
       uuid
-    auth-client (0.0.14)
-      service-client (>= 0.0.8)
+    auth-client (0.0.15)
+      service-client (>= 0.0.12)
     backports (2.6.7)
     bcrypt-ruby (3.0.1)
     bcrypt-ruby (3.0.1-java)
