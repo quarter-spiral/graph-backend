@@ -8,7 +8,7 @@ module Graph::Backend
       relationships: []
     }
 
-    attr_reader :neo4j, :auth
+    attr_reader :neo4j, :auth, :cache
 
     def self.create
       new(
@@ -19,7 +19,8 @@ module Graph::Backend
 
     def initialize(neo4j_url, auth_backend_url)
       @neo4j = ::Neography::Rest.new(neo4j_url)
-      @auth = Auth::Client.new(auth_backend_url)
+      @cache = ::Cache::Client.new(::Cache::Backend::IronCache, ENV['IRON_CACHE_PROJECT_ID'], ENV['IRON_CACHE_TOKEN'], ENV['IRON_CACHE_CACHE'])
+      @auth = Auth::Client.new(auth_backend_url, cache: @cache)
     end
 
     def setup_indices

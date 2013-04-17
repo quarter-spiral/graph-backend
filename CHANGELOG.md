@@ -1,3 +1,7 @@
+# 0.0.27 / Unreleased
+
+* Adds caching auth-client
+
 # 0.0.26 / 2013-04-02
 
 * Adds authorization

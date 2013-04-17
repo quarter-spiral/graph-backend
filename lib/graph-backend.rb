@@ -6,6 +6,9 @@ module Graph
   end
 end
 
+require 'cache-client'
+require 'cache-backend-iron-cache'
+
 require "graph-backend/version"
 require "graph-backend/error"
 require "graph-backend/connection"
