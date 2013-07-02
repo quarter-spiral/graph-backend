@@ -1,5 +1,6 @@
-# 0.0.28 / Unreleased
+# 0.0.28 / 2013-07-02
 
+* :gift: :birthday: BIRTHDAY RELEASE :birthday: :tada:
 * Adds relationships and node types for turnbased matches
 
 # 0.0.27 / 2013-04-17
