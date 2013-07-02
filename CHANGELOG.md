@@ -1,3 +1,7 @@
+# 0.0.28 / Unreleased
+
+* Adds relationships and node types for turnbased matches
+
 # 0.0.27 / 2013-04-17
 
 * Adds caching auth-client

@@ -1,6 +1,6 @@
 module Graph::Backend
   class Relation
-    RELATIONSHIP_TYPES = ['develops', 'friends', 'plays']
+    RELATIONSHIP_TYPES = ['develops', 'friends', 'plays', 'participates-in', 'is-a-match-of']
     DIRECTIONS = ['incoming', 'outgoing', 'both']
 
     attr_reader :uuid_source, :uuid_target, :relation, :meta
@@ -214,7 +214,7 @@ module Graph::Backend
     end
 
     def self.camelize_string(str)
-      str.sub(/^[a-z\d]*/) { $&.capitalize }.gsub(/(?:_|(\/))([a-z\d]*)/i) {$2.capitalize}
+      str.sub(/^[a-z\d]*/) { $&.capitalize }.gsub(/(?:_|-|(\/))([a-z\d]*)/i) {$2.capitalize}
     end
   end
 end

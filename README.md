@@ -409,18 +409,22 @@ The response might be: ``["developer"]``
 
 The supported relations are:
 
-| Name         | Description          | Example                                    |
-|--------------|----------------------|--------------------------------------------|
-| **develops** | Developer of a game  | Jumping Sun Studios develops Sun Jumper IV |
-| **friends**  | A friend of a player | Pete friends Kate                          |
+| Name                | Description          | Example                                    |
+|---------------------|----------------------|--------------------------------------------|
+| **develops**        | Developer of a game  | Jumping Sun Studios develops Sun Jumper IV |
+| **friends**         | A friend of a player | Pete friends Kate                          |
+| **plays**           | A player of a game   | Pete plays chess                           |
+| **is_a_match_of**   | A match of a game    | Match #527 is a game of chess              |
+| **participates_in** | A player in a match  | Pete participates in match #527            |
 
 ## Roles
 
 Every entity has a set of roles that define the node. Currently
 available roles are:
 
-| Name      | Description        |
-|-----------|--------------------|
-| developer | Developer of games |
-| game      | A game             |
-| player    | A player           |
+| Name            | Description        |
+|-----------------|--------------------|
+| developer       | Developer of games |
+| game            | A game             |
+| player          | A player           |
+| turnbased-match | A match            |

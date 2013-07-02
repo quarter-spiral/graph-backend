@@ -38,6 +38,19 @@ describe Graph::Backend::API do
           is_related?(@entity2, @entity1).must_equal false
         end
 
+        it "can create relationship named with hyphens" do
+          is_related?(@entity1, @entity2).must_equal false
+
+          client.post "/v1/entities/#{@entity1}/roles/player"
+          client.post "/v1/entities/#{@entity2}/roles/turnbased-match"
+
+          response = client.post "/v1/entities/#{@entity1}/participates-in/#{@entity2}"
+          JSON.parse(response.body).must_equal([{"source" => @entity1, "target" => @entity2, "relation" => "participates-in", "meta" => {}}])
+
+          is_related?(@entity1, @entity2, 'participates-in').must_equal true
+          is_related?(@entity2, @entity1, 'participates-in').must_equal false
+        end
+
         it "incoming" do
           is_related?(@entity1, @entity2).must_equal false
           response = client.post "/v1/entities/#{@entity1}/test_relates/#{@entity2}", {}, JSON.dump(direction: 'incoming')

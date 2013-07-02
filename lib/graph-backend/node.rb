@@ -1,6 +1,6 @@
 module Graph::Backend
   class Node
-    ROLES = ['developer', 'game', 'player']
+    ROLES = ['developer', 'game', 'player', 'turnbased-match']
 
     def self.find_or_create(uuid)
       node = connection.get_node_auto_index('uuid', uuid) || connection.create_node('uuid' => uuid)
