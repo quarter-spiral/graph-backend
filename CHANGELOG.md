@@ -1,3 +1,7 @@
+# 0.0.29 / Unreleased
+
+* Adds a special ping endpoint that calls NEO4J to monitor failures there
+
 # 0.0.28 / 2013-07-02
 
 * :gift: :birthday: BIRTHDAY RELEASE :birthday: :tada:

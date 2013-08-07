@@ -83,15 +83,23 @@ module Graph::Backend
       def system_privileges_only!
         prevent_access! unless system_level_privileges?
       end
+
+      def public_resource?(request)
+        request.env['PATH_INFO'].start_with?('/v1/public/')
+      end
     end
 
     before do
-      unless request.env['REQUEST_METHOD'] == 'OPTIONS'
+      unless request.env['REQUEST_METHOD'] == 'OPTIONS' || public_resource?(request)
         prevent_access! unless request.env['HTTP_AUTHORIZATION']
         token = request.env['HTTP_AUTHORIZATION'].gsub(/^Bearer\s+/, '')
         @token_owner = connection.auth.token_owner(token)
         prevent_access! unless @token_owner
       end
+    end
+
+    get "/public/__PING__" do
+      {'root_id' => connection.neo4j.get_root['self'].split('/').last}
     end
 
     get "version" do
