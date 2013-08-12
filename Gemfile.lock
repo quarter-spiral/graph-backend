@@ -28,6 +28,7 @@ PATH
       json (~> 1.7.7)
       neography (= 1.0.9)
       ping-middleware (~> 0.0.2)
+      qs-request-tracker (>= 0.0.2)
 
 GEM
   remote: https://rubygems.org/
@@ -171,6 +172,8 @@ GEM
       i18n (~> 0.6)
       padrino-core (= 0.10.7)
     ping-middleware (0.0.2)
+    qs-request-tracker (0.0.2)
+      uuid
     rack (1.4.5)
     rack-accept (0.4.5)
       rack (>= 0.4)

@@ -1,5 +1,6 @@
 # 0.0.30 / Unreleased
 
+* Adds request id tracking
 * Updates client dependencies
 
 # 0.0.29 / 2013-08-07
