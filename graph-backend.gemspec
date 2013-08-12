@@ -24,4 +24,5 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'cache-client', '~> 0.0.4'
   gem.add_dependency 'cache-backend-iron-cache', '~> 0.0.4'
   gem.add_dependency 'qs-request-tracker', '>= 0.0.2'
+  gem.add_dependency 'sentry-raven'
 end

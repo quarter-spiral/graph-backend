@@ -29,6 +29,7 @@ PATH
       neography (= 1.0.9)
       ping-middleware (~> 0.0.2)
       qs-request-tracker (>= 0.0.2)
+      sentry-raven
 
 GEM
   remote: https://rubygems.org/
@@ -194,6 +195,10 @@ GEM
     rest-client (1.6.7)
       mime-types (>= 1.16)
     rubyzip (0.9.9)
+    sentry-raven (0.6.0)
+      faraday (>= 0.7.6)
+      hashie (>= 1.1.0)
+      uuidtools
     service-client (0.0.14)
       faraday (= 0.8.1)
       json
@@ -224,6 +229,7 @@ GEM
       rack
     uuid (2.3.6)
       macaddr (~> 1.0)
+    uuidtools (2.1.4)
     virtus (0.5.5)
       backports (~> 3.3)
       descendants_tracker (~> 0.0.1)

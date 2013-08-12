@@ -1,5 +1,6 @@
 # 0.0.30 / Unreleased
 
+* Adds getsentry.com exception tracking
 * Adds request id tracking
 * Updates client dependencies
 
