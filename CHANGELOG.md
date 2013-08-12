@@ -1,3 +1,7 @@
+# 0.0.30 / Unreleased
+
+* Updates client dependencies
+
 # 0.0.29 / 2013-08-07
 
 * Adds a special ping endpoint that calls NEO4J to monitor failures there
