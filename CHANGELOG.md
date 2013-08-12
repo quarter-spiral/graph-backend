@@ -1,3 +1,7 @@
+# 0.0.32 / Unreleased
+
+* Fixed sentry app id
+
 # 0.0.31 / 2013-08-12
 
 * Fixes service-client request tracking
