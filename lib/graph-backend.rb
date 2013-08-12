@@ -8,8 +8,6 @@ end
 
 require 'cache-client'
 require 'cache-backend-iron-cache'
-require 'qs/request/tracker'
-require 'qs/request/tracker/service_client_extension'
 
 require "graph-backend/version"
 require "graph-backend/error"
@@ -27,3 +25,6 @@ if ['test', 'development'].include?(ENV['RACK_ENV'])
 end
 
 Graph::Backend.boot
+
+require 'qs/request/tracker'
+require 'qs/request/tracker/service_client_extension'
